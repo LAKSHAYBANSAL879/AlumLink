@@ -1,0 +1,77 @@
+[
+    {
+        "enrollmentNumber": "ENR42759",
+        "yearOfPassout": 2017,
+        "collegeName": "Jadavpur University"
+    },
+    {
+        "enrollmentNumber": "ENR36210",
+        "yearOfPassout": 2028,
+        "collegeName": "Amity University Noida"
+    },
+    {
+        "enrollmentNumber": "ENR54851",
+        "yearOfPassout": 2015,
+        "collegeName": "Jadavpur University"
+    },
+    {
+        "enrollmentNumber": "ENR41111",
+        "yearOfPassout": 2024,
+        "collegeName": "Lovely Professional University"
+    },
+    {
+        "enrollmentNumber": "ENR78724",
+        "yearOfPassout": 2021,
+        "collegeName": "National Institute of Technology Trichy"
+    },
+    {
+        "enrollmentNumber": "ENR93638",
+        "yearOfPassout": 2027,
+        "collegeName": "Amity University Noida"
+    },
+    {
+        "enrollmentNumber": "ENR74591",
+        "yearOfPassout": 2030,
+        "collegeName": "Vellore Institute of Technology"
+    },
+    {
+        "enrollmentNumber": "ENR75619",
+        "yearOfPassout": 2028,
+        "collegeName": "Indian Institute of Technology Bombay"
+    },
+    {
+        "enrollmentNumber": "ENR72037",
+        "yearOfPassout": 2030,
+        "collegeName": "Jamia Millia Islamia"
+    },
+    {
+        "enrollmentNumber": "ENR82391",
+        "yearOfPassout": 2025,
+        "collegeName": "Anna University"
+    },
+    {
+        "enrollmentNumber": "ENR47767",
+        "yearOfPassout": 2026,
+        "collegeName": "Jamia Millia Islamia"
+    },
+    {
+        "enrollmentNumber": "ENR96956",
+        "yearOfPassout": 2026,
+        "collegeName": "Indian Institute of Technology Bombay"
+    },
+    {
+        "enrollmentNumber": "ENR64427",
+        "yearOfPassout": 2026,
+        "collegeName": "Indian Institute of Technology Bombay"
+    },
+    {
+        "enrollmentNumber": "ENR24509",
+        "yearOfPassout": 2022,
+        "collegeName": "Indian Institute of Technology Madras"
+    },
+    {
+        "enrollmentNumber": "ENR96567",
+        "yearOfPassout": 2020,
+        "collegeName": "Manipal Institute of Technology"
+    }
+]

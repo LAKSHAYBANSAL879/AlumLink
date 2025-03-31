@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import {
   Box, Container, Grid, Paper, Typography, Card, CardContent, Stack, Avatar, List, ListItem, ListItemText, ListItemAvatar, Divider
 } from '@mui/material';
@@ -9,58 +9,175 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line,
   PieChart, Pie, Cell
 } from 'recharts';
+import { UserContext } from '../../userContext';
+import { Link } from 'react-router-dom';
+import DonationRequestModal from './DonationRequestModal';
+import axios from 'axios'; // Make sure to import axios
 
 const DonationDashboard = () => {
-  // Sample data
-  const monthlyDonations = [
-    { month: 'Jan', donations: 15000, requests: 45 },
-    { month: 'Feb', donations: 18000, requests: 52 },
-    { month: 'Mar', donations: 22000, requests: 58 },
-    { month: 'Apr', donations: 19000, requests: 48 },
-    { month: 'May', donations: 25000, requests: 62 },
-    { month: 'Jun', donations: 28000, requests: 65 }
-  ];
+  const [isModalOpen, setModalOpen] = useState(false);
+  const { user } = useContext(UserContext);
+  const userId=user?._id;
+  const [donationRequests, setDonationRequests] = useState([]);
+  const [topDonors, setTopDonors] = useState([]);
+  const [monthlyDonations, setMonthlyDonations] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
+  const [myRecentRequests, setMyRecentRequests] = useState([]);
+  const [myRecentDonations, setMyRecentDonations] = useState([]);
+  const [stats, setStats] = useState({
+    totalDonations: 0,
+    totalRequests: 0,
+    myRequests: 0,
+    myDonations: 0
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  useEffect(() => {
+    fetchDonations();
+  }, []);
 
-  const topDonors = [
-    { name: 'John Smith', amount: 12500 },
-    { name: 'Emma Wilson', amount: 10800 },
-    { name: 'Michael Brown', amount: 9500 },
-    { name: 'Sarah Davis', amount: 8200 },
-    { name: 'James Johnson', amount: 7800 }
-  ];
+  const fetchDonations = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/v1/donations/all');
+      setDonationRequests(Array.isArray(response.data) ? response.data : []);
+      processCategories(Array.isArray(response.data) ? response.data : [])
+      processMonthlyData(Array.isArray(response.data) ? response.data : [])
 
-  const categoryData = [
-    { name: 'Medical', value: 35 },
-    { name: 'Education', value: 25 },
-    { name: 'Disaster Relief', value: 20 },
-    { name: 'Animal Welfare', value: 12 },
-    { name: 'Others', value: 8 }
-  ];
-  
-  // New data for recent requests
-  const myRecentRequests = [
-    { id: 'REQ-1234', title: 'School Supplies for Children', category: 'Education', amount: 1500, date: '2025-02-20', status: 'Active' },
-    { id: 'REQ-1189', title: 'Emergency Medical Fund', category: 'Medical', amount: 3000, date: '2025-02-15', status: 'Funded' },
-    { id: 'REQ-1156', title: 'Community Garden Project', category: 'Community', amount: 800, date: '2025-02-10', status: 'Partially Funded' },
-    { id: 'REQ-1098', title: 'Animal Shelter Support', category: 'Animal Welfare', amount: 1200, date: '2025-02-01', status: 'Completed' }
-  ];
-  
-  // New data for recent donations
-  const myRecentDonations = [
-    { id: 'DON-2345', title: 'Hurricane Relief Fund', recipient: 'Red Cross', amount: 1000, date: '2025-02-23' },
-    { id: 'DON-2320', title: 'Children\'s Hospital Equipment', recipient: 'City Hospital', amount: 1500, date: '2025-02-18' },
-    { id: 'DON-2289', title: 'Scholarship Program', recipient: 'Education First', amount: 800, date: '2025-02-12' },
-    { id: 'DON-2254', title: 'Wildlife Conservation', recipient: 'Nature Trust', amount: 500, date: '2025-02-05' }
-  ];
+    } catch (err) {
+      alert("Failed to load donations.");
+    }
+  };
+  // console.log("all donations are",donationRequests.length)
+  useEffect(() => {
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
+
+  const fetchDashboardData = async () => {
+    setIsLoading(true);
+    try {
+      // Fetch top donors
+      const topDonorsRes = await axios.get('http://localhost:8080/api/v1/donations/top-donors');
+      setTopDonors(topDonorsRes.data.topDonors.map(donor => ({
+        name: donor.donor,
+        amount: donor.totalDonated
+      })));
+
+      // Fetch my donation requests
+      const myRequestsRes = await axios.get(`http://localhost:8080/api/v1/donations/my-requests/${userId}`);
+      // console.log("my requests rep is",myRequestsRes)
+      setMyRecentRequests(myRequestsRes.data.map(request => ({
+        title: request.title,
+        category: request.category,
+        amount: request.amountRequired,
+        date: request.createdAt,
+        status: getRequestStatus(request)
+      })).slice(0, 4)); 
+
+      // Fetch my donations
+      const myDonationsRes = await axios.get(`http://localhost:8080/api/v1/donations/my-donations/${userId}`);
+      setMyRecentDonations(myDonationsRes.data.map(donation => ({
+        title: donation.donationRequest.title,
+        recipient: donation.donationRequest.createdBy?.name || 'Anonymous',
+        amount: donation.amountDonated,
+        date: donation?.donationRequest?.createdAt
+      })).slice(0, 4)); 
+
+      setStats({
+        totalDonations: topDonorsRes.data.topDonors.reduce((sum, donor) => sum + donor.totalDonated, 0),
+        totalRequests: 0,
+        myRequests: myRequestsRes.data.length || 0,
+        myDonations: myDonationsRes.data.reduce((sum, donation) => sum + donation.amountDonated, 0),
+      });
+
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const processCategories = (donations) => {
+    if (donations.length > 0) {
+      const categoryCounts = donations.reduce((acc, request) => {
+        const category = request.category || 'Other';
+        acc[category] = (acc[category] || 0) + 1;
+        return acc;
+      }, {});
+      
+      // Convert to array format for pie chart
+      const categoryDataArray = Object.entries(categoryCounts).map(([name, value]) => ({ 
+        name, 
+        value,
+        // Add amount data for better visualization
+        amount: donations
+          .filter(req => req.category === name)
+          .reduce((sum, req) => sum + (req.amountRequired || 0), 0)
+      }));
+      
+      setCategoryData(categoryDataArray);
+    }
+  };
+  const processMonthlyData = (donations) => {
+    if (donations.length > 0) {
+      // Create a map to store monthly data
+      const monthlyData = {};
+      
+      // Get current year
+      const currentYear = new Date().getFullYear();
+      
+      // Process each donation
+      donations.forEach(request => {
+        if (request.createdAt) {
+          const date = new Date(request.createdAt);
+          const year = date.getFullYear();
+          
+          // Only process current year's data
+          if (year === currentYear) {
+            const month = date.toLocaleString('default', { month: 'short' });
+            
+            if (!monthlyData[month]) {
+              monthlyData[month] = {
+                month,
+                donations: 0,
+                requests: 0
+              };
+            }
+            
+            // Increment request count
+            monthlyData[month].requests += 1;
+            
+            // Add donation amount if available
+            monthlyData[month].donations += request.amountDonated || 0;
+          }
+        }
+      });
+      
+
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const sortedMonthlyData = months
+        .filter(month => monthlyData[month]) 
+        .map(month => monthlyData[month]);
+      
+      setMonthlyDonations(sortedMonthlyData);
+    }
+  };
+  // Helper function to determine request status
+  const getRequestStatus = (request) => {
+    const now = new Date();
+    const deadlineDate = new Date(request.deadline);
+    
+    if (request.amountRaised >= request.amountRequired) {
+      return 'Funded';
+    } else if (request.amountRaised > 0) {
+      return 'Partially Funded';
+    } else if (deadlineDate < now) {
+      return 'Completed';
+    } else {
+      return 'Active';
+    }
+  };
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-
-  const stats = {
-    totalDonations: 25000,
-    totalRequests: 156,
-    myRequests: 23,
-    myDonations: 5000
-  };
 
   // Dictionary of card configurations
   const cards = [
@@ -68,13 +185,13 @@ const DonationDashboard = () => {
       icon: <TrendingUp />,
       iconBg: 'bg-blue-500',
       label: 'Total Platform Donations',
-      value: `$${(stats.totalDonations / 1000).toFixed(1)}k`,
+      value: `Rs${(stats.totalDonations / 1000).toFixed(1)}k`,
     },
     {
       icon: <Assignment />,
       iconBg: 'bg-yellow-500',
       label: 'Total Requests',
-      value: stats.totalRequests,
+      value: donationRequests.length,
     },
     {
       icon: <PersonOutline />,
@@ -86,7 +203,7 @@ const DonationDashboard = () => {
       icon: <AccountBalance />,
       iconBg: 'bg-green-500',
       label: 'My Donations',
-      value: `$${(stats.myDonations / 1000).toFixed(1)}k`,
+      value: `Rs${(stats.myDonations / 1000).toFixed(1)}k`,
     }
   ];
   
@@ -101,7 +218,6 @@ const DonationDashboard = () => {
     return null;
   };
 
-  // Helper function to format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -118,12 +234,37 @@ const DonationDashboard = () => {
     }
   };
 
+  if (isLoading && user) {
+    return (
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Typography variant="h5">Loading dashboard data...</Typography>
+      </Container>
+    );
+  }
+console.log("stats are",categoryData);
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Header */}
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
-        My Donation Dashboard
-      </Typography>
+      <div className='flex justify-between'>
+        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
+          My Donation Dashboard
+        </Typography>
+        {user ? (
+          <button 
+            className="w-auto h-12 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 
+                     transition-colors duration-200 font-medium shadow-sm"
+            onClick={() => setModalOpen(true)}
+          >
+            Post Donation request
+          </button>
+        ) : (
+          <Link to='/login'>
+            <button className="px-5 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700">
+              Login first 
+            </button>
+          </Link>
+        )}
+      </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -208,103 +349,115 @@ const DonationDashboard = () => {
           </Paper>
         </Grid>
 
-        {/* NEW SECTION: Recent Donation Requests by Me */}
+        {/* Recent Donation Requests by Me */}
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
               <AccessTime sx={{ mr: 1 }} />
               My Recent Donation Requests
             </Typography>
-            <List>
-              {myRecentRequests.map((request, index) => (
-                <React.Fragment key={request.id}>
-                  <ListItem alignItems="flex-start">
-                    <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: getStatusColor(request.status) }}>
-                        {request.category.charAt(0)}
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        <Typography variant="subtitle1" component="span" sx={{ fontWeight: 'medium' }}>
-                          {request.title}
-                        </Typography>
-                      }
-                      secondary={
-                        <React.Fragment>
-                          <Typography component="span" variant="body2" color="text.primary">
-                            {request.id} • {request.category} • ${request.amount.toLocaleString()}
+            {myRecentRequests.length > 0 ? (
+              <List>
+                {myRecentRequests.map((request, index) => (
+                  <React.Fragment key={request.id}>
+                    <ListItem alignItems="flex-start">
+                      <ListItemAvatar>
+                        <Avatar sx={{ bgcolor: getStatusColor(request.status) }}>
+                          {request.category.charAt(0)}
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={
+                          <Typography variant="subtitle1" component="span" sx={{ fontWeight: 'medium' }}>
+                            {request.title}
                           </Typography>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                            <Typography variant="body2">{formatDate(request.date)}</Typography>
-                            <Typography 
-                              variant="body2" 
-                              sx={{ 
-                                color: getStatusColor(request.status),
-                                fontWeight: 'medium'
-                              }}
-                            >
-                              {request.status}
+                        }
+                        secondary={
+                          <React.Fragment>
+                            <Typography component="span" variant="body2" color="text.primary">
+                               {request.category} • ${request.amount.toLocaleString()}
                             </Typography>
-                          </Box>
-                        </React.Fragment>
-                      }
-                    />
-                  </ListItem>
-                  {index < myRecentRequests.length - 1 && <Divider variant="inset" component="li" />}
-                </React.Fragment>
-              ))}
-            </List>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                              <Typography variant="body2">{formatDate(request.date)}</Typography>
+                              <Typography 
+                                variant="body2" 
+                                sx={{ 
+                                  color: getStatusColor(request.status),
+                                  fontWeight: 'medium'
+                                }}
+                              >
+                                {request.status}
+                              </Typography>
+                            </Box>
+                          </React.Fragment>
+                        }
+                      />
+                    </ListItem>
+                    {index < myRecentRequests.length - 1 && <Divider variant="inset" component="li" />}
+                  </React.Fragment>
+                ))}
+              </List>
+            ) : (
+              <Typography variant="body2" sx={{ py: 2 }}>
+                You haven't created any donation requests yet.
+              </Typography>
+            )}
           </Paper>
         </Grid>
 
-        {/* NEW SECTION: Recent Donations Made by Me */}
+        {/* Recent Donations Made by Me */}
         <Grid item xs={12} md={6}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
               <AccessTime sx={{ mr: 1 }} />
               My Recent Donations
             </Typography>
-            <List>
-              {myRecentDonations.map((donation, index) => (
-                <React.Fragment key={donation.id}>
-                  <ListItem alignItems="flex-start">
-                    <ListItemAvatar>
-                      <Avatar sx={{ bgcolor: '#8884d8' }}>
-                        {donation.recipient.charAt(0)}
-                      </Avatar>
-                    </ListItemAvatar>
-                    <ListItemText
-                      primary={
-                        <Typography variant="subtitle1" component="span" sx={{ fontWeight: 'medium' }}>
-                          {donation.title}
-                        </Typography>
-                      }
-                      secondary={
-                        <React.Fragment>
-                          <Typography component="span" variant="body2" color="text.primary">
-                            {donation.id} • To: {donation.recipient}
+            {myRecentDonations.length > 0 ? (
+              <List>
+                {myRecentDonations.map((donation, index) => (
+                  <React.Fragment key={donation.id}>
+                    <ListItem alignItems="flex-start">
+                      <ListItemAvatar>
+                        <Avatar sx={{ bgcolor: '#8884d8' }}>
+                          {donation.recipient.charAt(0)}
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={
+                          <Typography variant="subtitle1" component="span" sx={{ fontWeight: 'medium' }}>
+                            {donation.title}
                           </Typography>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                            <Typography variant="body2">{formatDate(donation.date)}</Typography>
-                            <Typography 
-                              variant="body2" 
-                              sx={{ 
-                                color: '#10b981',  // green
-                                fontWeight: 'medium'
-                              }}
-                            >
-                              ${donation.amount.toLocaleString()}
+                        }
+                        secondary={
+                          <React.Fragment>
+                            <Typography component="span" variant="body2" color="text.primary">
+                              To: {donation.recipient}
                             </Typography>
-                          </Box>
-                        </React.Fragment>
-                      }
-                    />
-                  </ListItem>
-                  {index < myRecentDonations.length - 1 && <Divider variant="inset" component="li" />}
-                </React.Fragment>
-              ))}
-            </List>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                              <Typography variant="body2">{formatDate(donation.date)}</Typography>
+                              <Typography 
+                                variant="body2" 
+                                sx={{ 
+                                  color: '#10b981',  // green
+                                  fontWeight: 'medium'
+                                }}
+                              >
+                                ${donation.amount.toLocaleString()}
+                              </Typography>
+                            </Box>
+                          </React.Fragment>
+                        }
+                      />
+                    </ListItem>
+                    {index < myRecentDonations.length - 1 && <Divider variant="inset" component="li" />}
+                  </React.Fragment>
+                ))}
+              </List>
+            ) : (
+              <Typography variant="body2" sx={{ py: 2 }}>
+                You haven't made any donations yet.
+              </Typography>
+            )}
           </Paper>
         </Grid>
 
@@ -334,6 +487,11 @@ const DonationDashboard = () => {
           </Paper>
         </Grid>
       </Grid>
+      <DonationRequestModal
+        open={isModalOpen}
+        onClose={() => setModalOpen(false)}
+        userData={user}
+      />
     </Container>
   );
 };

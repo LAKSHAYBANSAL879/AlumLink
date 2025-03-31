@@ -1,6 +1,8 @@
 const Application = require("../models/application");
 const Job = require("../models/job");
 const  jobController  = require("./jobController");
+const Notification=require('../models/notification');
+const User=require('../models/User')
 // ✅ APPLY for a Job
 const applyForJob = async (req, res) => {
     try {
@@ -31,6 +33,38 @@ const applyForJob = async (req, res) => {
   
       job.applicants.push(applicantId);
       await job.save();
+
+      const applicant = await User.findById(applicantId);
+      const jobPoster = job.postedBy;
+      
+      const notificationToEmployer = new Notification({
+        userId: jobPoster,
+        type: 'application',
+        title: job.title,
+        message: `${applicant.name} applied for your job position`,
+        sourceId: newApplication._id,
+        refModel: 'Application',
+        sourceName: applicant.name
+      });
+      
+      const savedEmployerNotification = await notificationToEmployer.save();
+      
+      const notificationToApplicant = new Notification({
+        userId: applicantId,
+        type: 'application',
+        title: job.title,
+        message: `Your application for "${job.title}" at ${job.company} has been submitted`,
+        sourceId: newApplication._id,
+        refModel: 'Application',
+        sourceName: job.company
+      });
+      
+      const savedApplicantNotification = await notificationToApplicant.save();
+      
+      if (req.app.io) {
+        req.app.io.to(`user-${jobPoster}`).emit('new_notification', savedEmployerNotification);
+        req.app.io.to(`user-${applicantId}`).emit('new_notification', savedApplicantNotification);
+      }
   
       await jobController.deleteJobIfFull(jobId);
   
@@ -54,7 +88,24 @@ const updateApplicationStatus = async (req, res) => {
     if (!application) return res.status(404).json({ message: "Application not found" });
 
     application.status = status;
+    const job=await Job.findById(application.job);
     await application.save();
+    const notification = new Notification({
+      userId: application.applicant,
+      type: 'application',
+      title: job.title,
+      message: `Your application for "${job.title}" at "${job.company}" has been ${status.toLowerCase()}`,
+      sourceId: applicationId,
+      refModel: 'Application',
+      sourceName: job.company
+    });
+    
+    const savedNotification = await notification.save();
+    
+    if (req.app.io) {
+      req.app.io.to(`user-${application.applicant}`).emit('new_notification', savedNotification);
+    }
+
 
     res.status(200).json({ message: "Application status updated", application });
   } catch (error) {

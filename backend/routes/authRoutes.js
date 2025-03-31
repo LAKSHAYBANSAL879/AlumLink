@@ -16,6 +16,9 @@ router.post('/reset-password', userController.resetPassword);
 router.post('/saveJob', userController.saveJob);
 router.post('/unsaveJob', userController.unsaveJob);
 router.post('/getSavedJobs', userController.getSavedJobs);
+router.post('/saveBlog', userController.saveBlog);
+router.post('/unsaveBlog', userController.unsaveBlog);
+router.get('/getSavedBlogs/:userId', userController.getSavedBlogs);
 
 
 module.exports = router;

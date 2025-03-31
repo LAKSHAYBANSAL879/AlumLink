@@ -15,6 +15,8 @@ import JobApplicantsPage from './Components/JobPortal/JobApplicantsPage';
 import DonationPortal from './Components/DonationPortal/DonationPortal';
 import DonationHome from './Components/DonationPortal/DonationHome';
 import ProgressBarPrac from './Components/DonationPortal/ProgressBarPrac';
+import BlogHome from './Components/BlogsPortal/BlogHome';
+import BlogIndividual from './Components/BlogsPortal/BlogIndividual';
 
 
 function App() {
@@ -33,17 +35,8 @@ function App() {
           <Route path='/jobDesc/:jobId' element={<JobDescription />} />
           <Route path='/job-applications/:jobId' element={<JobApplicantsPage />} />
           <Route path='/donationPortal' element={<DonationHome />} />
-          <Route path='/prac' element={<ProgressBarPrac/>} />
-
-
-
-          
-
-
-
-
-          
-
+          <Route path='/blogs' element={<BlogHome />} />
+          <Route path='/blogIndi/:blogId' element={<BlogIndividual/>} />
 
         </Routes>
       </div>

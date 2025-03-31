@@ -18,6 +18,8 @@
     "nodemailer": "^6.9.16",
     "nodemon": "^3.1.9",
     "passport": "^0.7.0",
-    "salt": "^0.5.5"
+    "salt": "^0.5.5",
+    "socket.io": "^4.8.1",
+    "stripe": "^17.7.0"
   }
 }

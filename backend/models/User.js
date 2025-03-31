@@ -66,7 +66,9 @@ type:String
         type: Boolean,
         default: false
     },
-    savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }]
+    savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
+    savedBlogs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Blog' }]
+
 
 });
 userSchema.pre('save',async function (next){

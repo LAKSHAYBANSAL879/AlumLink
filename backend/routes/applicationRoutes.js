@@ -31,10 +31,7 @@ router.post("/apply", upload.fields([{ name: "resume" }, { name: "coverLetter" }
 router.put("/update-status", updateApplicationStatus);
 router.post("/getAppliedJobs", getUserAppliedJobs);
 router.post("/getApplicationEmployer", getApplicationsByEmployer);
-
 router.get("/getApplications/:jobId", getApplicationsForJob);
-
-
 
 // ✅ Serve Uploaded Files for Download
 router.get("/uploads/resumes/:filename", (req, res) => {

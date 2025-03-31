@@ -6,7 +6,6 @@ const jwtAuth = require('../middlewares/jwtAuth');
 const upload = require('../middlewares/upload');
 const router = express.Router();
 router.post('/post',jobController.postJob);
-router.get('/applied',jwtAuth,jobController.getUserAppliedJobs);
 router.get('/:jobId/applicants',jwtAuth,jobController.getJobApplicants);
 router.get('/all',jobController.getAllJobs);
 router.get('/:jobId',jobController.getJobById);

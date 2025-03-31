@@ -31,7 +31,7 @@ const postJob = async (req, res) => {
 // ✅ GET all Jobs
 const getAllJobs = async (req, res) => {
     try {
-      const jobs = await Job.find().populate("postedBy", "name email"); // Fetch all jobs and populate user details
+      const jobs = await Job.find().populate("postedBy"); // Fetch all jobs and populate user details
       res.status(200).json(jobs);
     } catch (error) {
       res.status(500).json({ message: "Error fetching jobs", error: error.message });
@@ -67,22 +67,6 @@ const getJobApplicants = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching applicants:", error);
-    res.status(500).json({ success: false, message: "Server Error" });
-  }
-};
-const getUserAppliedJobs = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    // Find all jobs where the user is in the applicants list
-    const jobs = await Job.find({ applicants: userId }).populate("postedBy", "name email");
-
-    res.status(200).json({
-      success: true,
-      appliedJobs: jobs,
-    });
-  } catch (error) {
-    console.error("Error fetching applied jobs:", error);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
@@ -171,12 +155,12 @@ const getPostedJobs = async (req, res) => {
   }
 };
 
+
 module.exports = {
   postJob,
   getAllJobs,
   getJobById,
   getJobApplicants,
-  getUserAppliedJobs,
   deleteJobIfFull,
   deleteJob,
   checkUserApplied,

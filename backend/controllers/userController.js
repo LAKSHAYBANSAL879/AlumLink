@@ -1,5 +1,6 @@
 const User = require('../models/User'); 
 const Job=require('../models/job')
+const Blog=require("../models/blog")
 const Record = require('../models/Record');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -448,4 +449,65 @@ exports.getSavedJobs = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Internal server error', error: error.message });
     }
+};
+exports.saveBlog = async (req, res) => {
+  try {
+      const { blogId, userId } = req.body;
+     
+
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+
+      // Check if job exists
+      const blog = await Blog.findById(blogId);
+      if (!blog) return res.status(404).json({ message: 'Blog not found' });
+
+      // Check if already saved
+      if (user.savedBlogs.includes(blogId)) {
+          return res.status(400).json({ message: 'Blog already saved' });
+      }
+
+      user.savedBlogs.push(blogId);
+      await user.save();
+
+      res.status(200).json({ message: 'Blog saved successfully', savedBlogs: user.savedBlogs });
+  } catch (error) {
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+// Remove a Blog from saved jobs
+exports.unsaveBlog = async (req, res) => {
+  try {
+      const { blogId,userId } = req.body;
+
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ message: 'User not found' });
+
+      user.savedBlogs = user.savedBlogs.filter(id => id.toString() !== blogId);
+      await user.save();
+
+      res.status(200).json({ message: 'Blog removed from saved blogs', savedBlogs: user.savedBlogs });
+  } catch (error) {
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+};
+
+// Get all saved Blogs for a user
+
+exports.getSavedBlogs = async (req, res) => {
+  try {
+      const {userId} = req.params;
+
+      const user = await User.findById(userId)
+      .populate({
+        path: "savedBlogs",
+        populate: { path: "author", select: "name email" }
+      });
+      if (!user) return res.status(404).json({ message: 'User not found' });
+
+      res.status(200).json({ savedBlogs: user.savedBlogs });
+  } catch (error) {
+      res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
 };

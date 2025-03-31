@@ -19,6 +19,7 @@ export default function JobsPage() {
     const fetchJobs = async () => {
       try {
         const response = await axios.get('http://localhost:8080/api/v1/jobs/all'); 
+        console.log("job data is",response.data);
         setJobsData(response.data);
       } catch (error) {
         console.error('Error fetching job data:', error);

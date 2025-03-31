@@ -14,7 +14,7 @@ Modal.setAppElement('#root');
 const employmentTypes = ['Full-time', 'Part-time', 'Internship'];
 const experienceRequireds = ['Fresher', '0-3 years', '3+ years'];
 
-const JobPostingModal = ({ isOpen, onClose, onSubmit, loggedInUser }) => {
+const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
     const initialFormData = {
         title: '',
         category: '',
@@ -102,8 +102,6 @@ const JobPostingModal = ({ isOpen, onClose, onSubmit, loggedInUser }) => {
     
             const result = await response.json();
             console.log("Job posted successfully:", result);
-    
-            onSubmit(result.job); // Update UI with new job
             resetForm();
             onClose();
         } catch (error) {

@@ -1,89 +1,106 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
-  Card, CardContent, CardMedia, Typography, Button, LinearProgress, Chip, Box, Container, Grid, Stack, Avatar, Divider, IconButton, Paper, List, ListItem, ListItemIcon, ListItemText, Tooltip, Modal, Switch, FormControlLabel, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableContainer, TableHead, TableRow
+  Card, CardContent, CardMedia, Typography, Button, LinearProgress, Chip, Box, Container, Grid, Stack, Avatar, Divider, IconButton, Paper, List, ListItem, ListItemIcon, ListItemText, Tooltip, Modal, Switch, FormControlLabel, Dialog, DialogTitle, DialogContent, DialogActions, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Select, MenuItem, TextField
 } from '@mui/material';
 import { 
   Favorite as HeartIcon, CalendarToday as CalendarIcon, Timeline as TargetIcon, Description as DocumentIcon,
   Download as DownloadIcon, AccountCircle as UserIcon, Category as CategoryIcon, VerifiedUser as VerifiedIcon,
   People as PeopleIcon, Close as CloseIcon, Check as CheckIcon, Cancel as CancelIcon
 } from '@mui/icons-material';
+import {
+  Verified as VerifiedIco,
+  HourglassEmpty as PendingIcon,
+  Cancel as RejectedIcon
+} from "@mui/icons-material";
+import { UserContext } from '../../userContext';
+import axios from 'axios';
+import { BadgeInfo } from 'lucide-react';
+import DonationModal from './DonationModal';
+import DonarsDialog from './DonarsDialog'
 
 const DonationPortal = () => {
-  // Mock logged in user (for demo purposes)
-  const [loggedInUser, setLoggedInUser] = useState({
-    id: 1, // This matches with John Smith's request
-    name: "John Smith",
-    isAdmin: true
-  });
+  const { user } = useContext(UserContext);
 
-  // State for donation requests
-  const [donationRequests, setDonationRequests] = useState([
-    {
-      id: 1,
-      title: "Medical Emergency Fund",
-      description: "Urgent medical treatment needed for cancer patient. We are seeking support for critical medical procedures and ongoing care requirements.",
-      requester: "John Smith",
-      requesterId: 1, // Added to match with logged in user ID
-      requesterAvatar: "/api/placeholder/40/40",
-      targetAmount: 5000,
-      currentAmount: 3200,
-      deadline: "2025-03-15",
-      category: "Medical",
-      isVerified: true,
-      documents: [
-        { name: "Medical_Report.pdf", size: "2.4 MB", type: "application/pdf" },
-        { name: "Hospital_Bill.pdf", size: "1.1 MB", type: "application/pdf" },
-        { name: "Doctor_Statement.pdf", size: "890 KB", type: "application/pdf" }
-      ],
-      donorsCount: 45,
-      donors: [
-        { id: 101, name: "Emma Wilson", amount: 500, date: "2025-02-20", avatar: "/api/placeholder/40/40" },
-        { id: 102, name: "James Davis", amount: 250, date: "2025-02-18", avatar: "/api/placeholder/40/40" },
-        { id: 103, name: "Olivia Martinez", amount: 1000, date: "2025-02-15", avatar: "/api/placeholder/40/40" },
-        { id: 104, name: "Anonymous Donor", amount: 150, date: "2025-02-12", avatar: null },
-        { id: 105, name: "Michael Brown", amount: 300, date: "2025-02-10", avatar: "/api/placeholder/40/40" }
-      ]
-    },
-    {
-      id: 2,
-      title: "Education Support Program",
-      description: "Help provide school supplies for underprivileged children. This initiative aims to support 100 students with essential educational materials.",
-      requester: "Sarah Johnson",
-      requesterId: 2,
-      requesterAvatar: "/api/placeholder/40/40",
-      targetAmount: 2000,
-      currentAmount: 800,
-      deadline: "2025-03-30",
-      category: "Education",
-      isVerified: false,
-      documents: [
-        { name: "Program_Details.pdf", size: "1.8 MB", type: "application/pdf" },
-        { name: "Budget_Breakdown.xlsx", size: "756 KB", type: "application/excel" }
-      ],
-      donorsCount: 23,
-      donors: [
-        { id: 201, name: "Robert Johnson", amount: 200, date: "2025-02-19", avatar: "/api/placeholder/40/40" },
-        { id: 202, name: "Patricia Taylor", amount: 150, date: "2025-02-17", avatar: "/api/placeholder/40/40" },
-        { id: 203, name: "Anonymous Donor", amount: 100, date: "2025-02-14", avatar: null },
-        { id: 204, name: "Thomas Anderson", amount: 200, date: "2025-02-11", avatar: "/api/placeholder/40/40" },
-        { id: 205, name: "Anonymous Donor", amount: 150, date: "2025-02-08", avatar: null }
-      ]
-    }
-  ]);
-
-  // State for donor list modal
+  const [donationRequests, setDonationRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [donorModalOpen, setDonorModalOpen] = useState(false);
-  const [currentDonors, setCurrentDonors] = useState([]);
+  const [donationModalOpen, setDonationModalOpen] = useState(false);
+  const [selectedDonationRequest, setSelectedDonationRequest] = useState(null);
+  const [selectedDonationRequestId, setSelectedDonationRequestId] = useState(null);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [currentRequestForStatus, setCurrentRequestForStatus] = useState(null);
+  const [adminRemarks, setAdminRemarks] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
 
+  useEffect(() => {
+    fetchDonations();
+  }, []);
+
+const fetchDonations = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('http://localhost:8080/api/v1/donations/all');
+      
+      const currentDate = new Date();
+      const filteredDonations = Array.isArray(response.data) 
+        ? response.data.filter(donation => {
+            const deadlineDate = new Date(donation.deadline);
+            return deadlineDate >= currentDate;
+          })
+        : [];
+      
+      setDonationRequests(filteredDonations);
+    } catch (err) {
+      setError("Failed to load donations.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  const isExpired = (deadline) => {
+    const deadlineDate = new Date(deadline);
+    const currentDate = new Date();
+    return deadlineDate < currentDate;
+  };
+
+  const handleExpiredRequest = async (requestId) => {
+    try {
+      await axios.delete(`http://localhost:8080/api/v1/donations/${requestId}/deleteExp`);
+      fetchDonations();
+    } catch (error) {
+      console.error("Error handling expired request:", error);
+    }
+  };
+
+  useEffect(() => {
+    const checkExpiredDonations = () => {
+      donationRequests.forEach(donation => {
+        if (isExpired(donation.deadline)) {
+          handleExpiredRequest(donation._id);
+        }
+      });
+    };
+
+    if (donationRequests.length > 0) {
+      checkExpiredDonations();
+    }
+
+    const intervalId = setInterval(checkExpiredDonations, 3600000); // 1 hour
+
+    return () => clearInterval(intervalId);
+  }, [donationRequests]);
+  
+  if (loading) return <p>Loading donations...</p>;
+  if (error) return <p>{error}</p>;
 
   const calculateProgress = (current, target) => {
     return (current / target) * 100;
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
     }).format(amount);
   };
 
@@ -93,24 +110,54 @@ const DonationPortal = () => {
   };
 
   const handleDownload = (documentName) => {
-    // Implement document download logic here
-    console.log(`Downloading ${documentName}`);
+    const fileUrl = `http://localhost:8080/api/v1/donations/${documentName}`;
+    window.open(fileUrl, '_blank');
   };
 
-  // New function to toggle verification status
-  const toggleVerificationStatus = (requestId) => {
-    setDonationRequests(prevRequests => 
-      prevRequests.map(req => 
-        req.id === requestId 
-          ? { ...req, isVerified: !req.isVerified } 
-          : req
-      )
-    );
+  const openStatusDialog = (request) => {
+    setCurrentRequestForStatus(request);
+    setSelectedStatus(request.status || 'pending');
+    setAdminRemarks(request.adminRemark || '');
+    setStatusDialogOpen(true);
+  };
+
+  const closeStatusDialog = () => {
+    setStatusDialogOpen(false);
+    setCurrentRequestForStatus(null);
+    setAdminRemarks('');
+  };
+
+  // Function to handle status change submission
+  const handleStatusChange = async () => {
+    try {
+      const requestId=currentRequestForStatus?._id;
+      const response = await axios.put(
+        `http://localhost:8080/api/v1/donations/${requestId}/status`,
+        {
+          status: selectedStatus,
+          adminRemarks: adminRemarks,
+          adminId: user?._id
+        }
+      );
+      
+      // Update the local state with the new status information
+      setDonationRequests(prevRequests => 
+        prevRequests.map(req => 
+          req._id === currentRequestForStatus._id 
+            ? { ...req, status: selectedStatus, adminRemark: adminRemarks, verifiedBy: user?._id } 
+            : req
+        )
+      );
+      
+      closeStatusDialog();
+    } catch (error) {
+      console.error('Error updating donation status:', error);
+    }
   };
 
   // Function to open donor list modal
-  const openDonorModal = (donors) => {
-    setCurrentDonors(donors);
+  const openDonorModal = (donationRequestId) => {
+    setSelectedDonationRequestId(donationRequestId);
     setDonorModalOpen(true);
   };
 
@@ -118,6 +165,61 @@ const DonationPortal = () => {
   const closeDonorModal = () => {
     setDonorModalOpen(false);
   };
+
+  const openDonationModal = (request) => {
+    setSelectedDonationRequest(request);
+    setDonationModalOpen(true);
+  };
+
+  // Close donation modal
+  const closeDonationModal = () => {
+    setDonationModalOpen(false);
+  };
+
+  const getVerificationIcon = (status, remark) => {
+    switch (status) {
+      case "approved":
+        return (
+          <Tooltip title={remark}>
+             <VerifiedIco sx={{ color: "green" }} />
+          </Tooltip>
+           
+         
+        );
+      case "pending":
+        return (
+          <Tooltip title={remark}>
+            <PendingIcon sx={{ color: "orange" }} />
+            </Tooltip>
+         
+        );
+      case "rejected":
+        return (
+          <Tooltip title={remark}>
+            <RejectedIcon sx={{ color: "red" }} />
+            </Tooltip>
+          
+        );
+      default:
+        return (
+            <BadgeInfo color="primary" />
+        );
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case "approved":
+        return "Approved";
+      case "rejected":
+        return "Rejected";
+      case "pending":
+      default:
+        return "Pending";
+    }
+  };
+
+ 
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -131,233 +233,269 @@ const DonationPortal = () => {
       </Box>
 
       <Grid container spacing={4}>
-        {donationRequests.map((request) => (
-          <Grid item xs={12} key={request.id}>
-            <Card sx={{ 
-              borderRadius: 2,
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              overflow: 'hidden'
-            }}>
-              <CardContent sx={{ p: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <Avatar src={request.requesterAvatar} alt={request.requester} />
-                    <Box>
-                      <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-                        {request.title}
-                        {request.isVerified && (
-                          <Tooltip title="Verified Request">
-                            <VerifiedIcon sx={{ ml: 1, color: 'primary.main', fontSize: '20px' }} />
-                          </Tooltip>
-                        )}
-                      </Typography>
-                      <Stack direction="row" spacing={2} alignItems="center">
-                        <Typography variant="subtitle2" color="text.secondary">
-                          by {request.requester}
+        {donationRequests?.length > 0 ? (
+          donationRequests?.map((request) => (
+            <Grid item xs={12} key={request?._id}>
+              <Card sx={{ 
+                borderRadius: 2,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                overflow: 'hidden'
+              }}>
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Avatar src={request?.createdBy?.avatar} alt={request?.createdBy?.name} />
+                      <Box>
+                        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 2 }}>
+                          {request.title}
+                          {getVerificationIcon(request?.status, request.adminRemarks)}
                         </Typography>
-                        <Chip 
-                          label={request.category}
-                          color="primary"
-                          size="small"
-                          icon={<CategoryIcon />}
-                        />
-                      </Stack>
-                    </Box>
-                  </Box>
-                  
-                  {/* Admin Verification Control */}
-                  {loggedInUser.isAdmin && (
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <FormControlLabel
-                        control={
-                          <Switch
-                            checked={request.isVerified}
-                            onChange={() => toggleVerificationStatus(request.id)}
-                            color="primary"
-                          />
-                        }
-                        label={
-                          <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                            {request.isVerified ? "Verified" : "Not Verified"}
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Typography variant="subtitle2" color="text.secondary">
+                            by {request?.createdBy?.name}
                           </Typography>
-                        }
-                      />
+                          <Chip 
+                            label={request.category}
+                            color="primary"
+                            size="small"
+                            icon={<CategoryIcon />}
+                          />
+                          <Chip 
+                            label={getStatusLabel(request?.status)}
+                            color={
+                              request?.status === "approved" ? "success" : 
+                              request?.status === "rejected" ? "error" : 
+                              "warning"
+                            }
+                            size="small"
+                          />
+                        </Stack>
+                      </Box>
                     </Box>
-                  )}
-                </Box>
-
-                <Typography variant="body1" sx={{ mb: 4 }}>
-                  {request.description}
-                </Typography>
-
-                <Paper variant="outlined" sx={{ p: 2, mb: 4, bgcolor: 'background.default' }}>
-                  <Typography variant="subtitle2" gutterBottom sx={{ color: 'text.secondary' }}>
-                    Supporting Documents
-                  </Typography>
-                  <List dense>
-                    {request.documents.map((doc, index) => (
-                      <ListItem
-                        key={index}
-                        secondaryAction={
-                          <IconButton edge="end" onClick={() => handleDownload(doc.name)}>
-                            <DownloadIcon />
-                          </IconButton>
-                        }
-                      >
-                        <ListItemIcon>
-                          <DocumentIcon />
-                        </ListItemIcon>
-                        <ListItemText 
-                          primary={doc.name}
-                          secondary={doc.size}
-                        />
-                      </ListItem>
-                    ))}
-                  </List>
-                </Paper>
-
-                <Box sx={{ mb: 4 }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                      {formatCurrency(request.currentAmount)} raised of {formatCurrency(request.targetAmount)}
-                    </Typography>
-                    <Typography variant="body2" color="primary">
-                      {request.donorsCount} donors
-                    </Typography>
+                    
+                    {/* Admin Control Section */}
+                    {user?.role === "admin" && (
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Button
+                          variant="outlined"
+                          onClick={() => openStatusDialog(request)}
+                          startIcon={request?.status === "approved" ? <VerifiedIco /> : <PendingIcon />}
+                          color={
+                            request?.status === "approved" ? "success" : 
+                            request?.status === "rejected" ? "error" : 
+                            "warning"
+                          }
+                          sx={{ 
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            fontWeight: 'medium'
+                          }}
+                        >
+                          {request?.status === "pending" ? "Review" : "Change Status"}
+                        </Button>
+                      </Box>
+                    )}
                   </Box>
-                  <LinearProgress 
-                    variant="determinate" 
-                    value={calculateProgress(request.currentAmount, request.targetAmount)}
-                    sx={{ 
-                      height: 8, 
-                      borderRadius: 4,
-                      bgcolor: 'grey.100',
-                      '& .MuiLinearProgress-bar': {
+
+                  <Typography className='' sx={{textAlign:'left'}}>
+                    {request?.description}
+                  </Typography>
+
+                  <Paper variant="outlined" sx={{ p: 2, mb: 4, bgcolor: 'background.default' }}>
+                    <Typography variant="subtitle2" gutterBottom sx={{ color: 'text.secondary' }}>
+                      Supporting Documents
+                    </Typography>
+                    <List dense>
+                      {request?.supportingDocuments?.map((doc, index) => (
+                        <ListItem
+                          key={index}
+                          secondaryAction={
+                            <IconButton edge="end" onClick={() => handleDownload(doc)}>
+                              <DownloadIcon />
+                            </IconButton>
+                          }
+                        >
+                          <ListItemIcon>
+                            <DocumentIcon />
+                          </ListItemIcon>
+                          <ListItemText 
+                            primary={doc.split('\\').pop().split('-').slice(1).join('-')}
+                          />
+                        </ListItem>
+                      ))}
+                    </List>
+                  </Paper>
+
+                  <Box sx={{ mb: 4 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                        {formatCurrency(request?.amountRaised)} raised of {formatCurrency(request?.amountRequired)}
+                      </Typography>
+                   
+                    </Box>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={calculateProgress(request?.amountRaised, request?.amountRequired)}
+                      sx={{ 
+                        height: 8, 
                         borderRadius: 4,
-                      }
-                    }}
-                  />
-                </Box>
+                        bgcolor: 'grey.100',
+                        '& .MuiLinearProgress-bar': {
+                          borderRadius: 4,
+                        }
+                      }}
+                    />
+                  </Box>
 
-                <Divider sx={{ mb: 3 }} />
+                  <Divider sx={{ mb: 3 }} />
 
-                <Stack 
-                  direction="row" 
-                  justifyContent="space-between" 
-                  alignItems="center"
-                >
-                  <Stack direction="row" spacing={3}>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <CalendarIcon sx={{ fontSize: 20, mr: 1, color: 'text.secondary' }} />
-                      <Typography variant="body2">
-                        {getDaysRemaining(request.deadline)} days left
-                      </Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <TargetIcon sx={{ fontSize: 20, mr: 1, color: 'text.secondary' }} />
-                      <Typography variant="body2">
-                        {Math.round(calculateProgress(request.currentAmount, request.targetAmount))}% funded
-                      </Typography>
-                    </Box>
-                  </Stack>
+                  <Stack 
+                    direction="row" 
+                    justifyContent="space-between" 
+                    alignItems="center"
+                  >
+                    <Stack direction="row" spacing={3}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <CalendarIcon sx={{ fontSize: 20, mr: 1, color: 'text.secondary' }} />
+                        <Typography variant="body2">
+                          {getDaysRemaining(request?.deadline)} days left
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <TargetIcon sx={{ fontSize: 20, mr: 1, color: 'text.secondary' }} />
+                        <Typography variant="body2">
+                          {Math.round(calculateProgress(request?.amountRaised, request?.amountRequired))}% funded
+                        </Typography>
+                      </Box>
+                    </Stack>
 
-                  <Stack direction="row" spacing={2}>
-                    {/* View Donors Button (only for request owner) */}
-                    {loggedInUser.id === request.requesterId && (
+                    <Stack direction="row" spacing={2}>
+                      {/* View Donors Button (only for request owner) */}
+                      {user?._id === request?.createdBy?._id && (
+                        <Button 
+                          variant="outlined"
+                          color="primary"
+                          startIcon={<PeopleIcon />}
+                          onClick={() => openDonorModal(request?._id)}
+                          sx={{ 
+                            borderRadius: 2,
+                            textTransform: 'none',
+                            fontWeight: 'medium'
+                          }}
+                        >
+                          View Donors
+                        </Button>
+                      )}
+                      
                       <Button 
-                        variant="outlined"
+                        variant="contained" 
                         color="primary"
-                        startIcon={<PeopleIcon />}
-                        onClick={() => openDonorModal(request.donors)}
+                        size="large"
+                        startIcon={<HeartIcon />}
                         sx={{ 
                           borderRadius: 2,
+                          px: 4,
                           textTransform: 'none',
-                          fontWeight: 'medium'
+                          fontWeight: 'bold'
                         }}
+                        onClick={() => openDonationModal(request)}
+                        disabled={request?.status !== "approved" || request?.amountRaised>=request?.amountRequired}
                       >
-                        View Donors
+                        Donate Now
                       </Button>
-                    )}
-                    
-                    <Button 
-                      variant="contained" 
-                      color="primary"
-                      size="large"
-                      startIcon={<HeartIcon />}
-                      sx={{ 
-                        borderRadius: 2,
-                        px: 4,
-                        textTransform: 'none',
-                        fontWeight: 'bold'
-                      }}
-                    >
-                      Donate Now
-                    </Button>
+                    </Stack>
                   </Stack>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
+                </CardContent>
+              </Card>
+            </Grid>
+          ))
+        ) : (
+          <Typography variant="h6" textAlign="center">
+            No donation requests available.
+          </Typography> 
+        )}
       </Grid>
 
-      {/* Donor List Modal */}
-      <Dialog
-        open={donorModalOpen}
-        onClose={closeDonorModal}
-        maxWidth="md"
-        fullWidth
-      >
+      {/* Admin Status Dialog */}
+      <Dialog open={statusDialogOpen} onClose={closeStatusDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h6" component="div" sx={{ display: 'flex', alignItems: 'center' }}>
-              <PeopleIcon sx={{ mr: 1 }} /> Donor List
-            </Typography>
-            <IconButton
-              edge="end"
-              color="inherit"
-              onClick={closeDonorModal}
-              aria-label="close"
-            >
+            <Typography variant="h6">Review Donation Request</Typography>
+            <IconButton onClick={closeStatusDialog} size="small">
               <CloseIcon />
             </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent dividers>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Donor</TableCell>
-                  <TableCell>Date</TableCell>
-                  <TableCell align="right">Amount</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {currentDonors.map((donor) => (
-                  <TableRow key={donor.id}>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Avatar src={donor.avatar} alt={donor.name}>
-                          {!donor.avatar && donor.name.charAt(0)}
-                        </Avatar>
-                        <Typography variant="body2">{donor.name}</Typography>
-                      </Box>
-                    </TableCell>
-                    <TableCell>{new Date(donor.date).toLocaleDateString()}</TableCell>
-                    <TableCell align="right">{formatCurrency(donor.amount)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+        <DialogContent>
+          <Box sx={{ my: 2 }}>
+            <Typography variant="subtitle1" gutterBottom>
+              {currentRequestForStatus?.title}
+            </Typography>
+            
+            <Box sx={{ mt: 3 }}>
+              <Typography variant="body2" gutterBottom color="text.secondary">
+                Status
+              </Typography>
+              <Select
+                fullWidth
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                size="small"
+                sx={{ mb: 3 }}
+              >
+                <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="approved">Approved</MenuItem>
+                <MenuItem value="rejected">Rejected</MenuItem>
+              </Select>
+              
+              <Typography variant="body2" gutterBottom color="text.secondary">
+                Admin Remarks
+              </Typography>
+              <TextField
+                fullWidth
+                multiline
+                rows={3}
+                value={adminRemarks}
+                onChange={(e) => setAdminRemarks(e.target.value)}
+                placeholder="Add your remarks about this donation request"
+                variant="outlined"
+                size="small"
+              />
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDonorModal} color="primary">
-            Close
+          <Button onClick={closeStatusDialog} color="inherit">
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleStatusChange} 
+            variant="contained" 
+            color={selectedStatus === "approved" ? "success" : selectedStatus === "rejected" ? "error" : "primary"}
+            startIcon={selectedStatus === "approved" ? <CheckIcon /> : selectedStatus === "rejected" ? <CancelIcon /> : <PendingIcon />}
+          >
+            {selectedStatus === "approved" ? "Approve" : selectedStatus === "rejected" ? "Reject" : "Update"}
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Donor List Dialog */}
+      <DonarsDialog 
+        open={donorModalOpen}
+        donationRequestId={selectedDonationRequestId}
+        onClose={closeDonorModal}
+      />
+
+      {/* Donation Modal */}
+      {selectedDonationRequest && (
+        <DonationModal
+          open={donationModalOpen}
+          onClose={closeDonationModal}
+          donationRequestId={selectedDonationRequest._id}
+          donorId={user?._id}
+          title={selectedDonationRequest.title}
+        />
+      )}
     </Container>
   );
 };

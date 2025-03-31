@@ -60,9 +60,9 @@ const HrDashboard = () => {
     generateApplicationTrends();
   }, [applications]);
 
-  const handleJobPost = (jobData) => {
-    console.log("Job Posted Successfully:", jobData);
-  };
+  // const handleJobPost = (jobData) => {
+  //   console.log("Job Posted Successfully:", jobData);
+  // };
 
   const generateApplicationTrends = () => {
     let trends = {};
@@ -327,7 +327,7 @@ const HrDashboard = () => {
       <JobPostingModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
-        onSubmit={handleJobPost}
+        // onSubmit={handleJobPost}
         loggedInUser={user}
       />
     </div>

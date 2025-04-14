@@ -19,6 +19,8 @@ router.post('/getSavedJobs', userController.getSavedJobs);
 router.post('/saveBlog', userController.saveBlog);
 router.post('/unsaveBlog', userController.unsaveBlog);
 router.get('/getSavedBlogs/:userId', userController.getSavedBlogs);
+router.post('/logout/:userId',userController.userLogout);
+
 
 
 module.exports = router;

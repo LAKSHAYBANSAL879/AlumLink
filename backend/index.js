@@ -10,6 +10,7 @@ const session = require('express-session');
 const User = require('./models/User.js');
 const http = require('http');
 const socketIO = require('socket.io');
+const { initializeSocket } = require('./socket.js');
 
 dotenv.config();
 
@@ -24,8 +25,11 @@ const io = socketIO(server, {
   }
 });
 
+// Initialize Socket.IO
+const { connectedUsers } = initializeSocket(io);
+
 // Make io accessible in routes
-app.io = io;
+global.io = io;
 
 app.use(cookieParser());
 
@@ -40,23 +44,6 @@ app.use(session({
   cookie: { secure: false },
 }));
 
-// Socket.IO setup
-io.on('connection', (socket) => {
-  console.log('New client connected');
-  
-  // Authenticate user and join their personal room
-  socket.on('authenticate', (userId) => {
-    if (userId) {
-      socket.join(`user-${userId}`);
-      console.log(`User ${userId} authenticated and joined personal room`);
-    }
-  });
-  
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  });
-});
-
 // Routes
 app.use("/api/v1/auth", require("./routes/authRoutes.js"));
 app.use("/api/v1/jobs", require("./routes/jobRoutes.js"));
@@ -64,6 +51,7 @@ app.use("/api/v1/application", require("./routes/applicationRoutes.js"));
 app.use("/api/v1/donations", require("./routes/donationRoutes.js"));
 app.use("/api/v1/notification", require("./routes/notificationRoutes.js"));
 app.use("/api/v1/blogs", require("./routes/blogRoutes.js"));
+app.use("/api/v1/messages", require("./routes/messageRoutes.js"));
 
 
 // Ensure admin exists
@@ -77,7 +65,7 @@ app.use("/api/v1/blogs", require("./routes/blogRoutes.js"));
 })();
 
 // Set the port
-const PORT = process.env.PORT || 8081;
+const PORT = process.env.PORT || 8080;
 
 // Start the server (changed from app.listen to server.listen for Socket.IO)
 server.listen(PORT, () => {

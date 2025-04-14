@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import Cookies from "js-cookie";
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const ProfilePage = () => {
@@ -44,12 +44,18 @@ const ProfilePage = () => {
     }
   }, [user]);
 
-  const handleLogout = () => {
-    setUser(null);
-    Cookies.remove("token");
-    history("/login");
+  const handleLogout = async () => {
+    try {
+      const userId=user._id
+      await axios.post(`http://localhost:8080/api/v1/auth/logout/${userId}`);
+  
+      setUser(null);
+      Cookies.remove("token");
+      Navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
-
   const handleUpdateProfile = async () => {
     try {
       const token = Cookies.get("token");

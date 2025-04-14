@@ -168,54 +168,6 @@ const BlogPortal = () => {
     }
   }, [allBlogs, likedBlogs, blogInteractions]);
 
-  // Fetch similar blogs based on a specific blog ID
-  // const fetchSimilarBlogs = async (blogId) => {
-  //   setIsLoading(true);
-  //   try {
-  //     // Prepare blogs for recommendation
-  //     const processedAllBlogs = allBlogs.map(blog => ({
-  //       id: blog._id,
-  //       title: blog.title,
-  //       subtitle: blog.subtitle,
-  //       category: blog.category,
-  //       content: blog.content
-  //     }));
-
-  //     // Call similar blogs endpoint
-  //     const response = await axios.post('http://localhost:5000/get_similar_blogs', {
-  //       all_blogs: processedAllBlogs,
-  //       blog_id: blogId,
-  //       top_n: 5
-  //     });
-
-  //     // Process similar blogs
-  //     const processedSimilarBlogs = response.data.map(blog => {
-  //       // Find the original blog to get full details
-  //       const originalBlog = allBlogs.find(b => b._id === blog.id) || {};
-        
-  //       return {
-  //         ...originalBlog,
-  //         ...blog,
-  //         _id: blog.id,
-  //         id: blog.id,
-  //         image: originalBlog.coverPhoto || DEFAULT_BLOG_IMAGE,
-  //         timeAgo: formatTimeAgo(originalBlog.createdAt || new Date()),
-  //         categories: ['all', 'similar', blog.category || 'other'],
-  //         author: originalBlog.author || {
-  //           name: blog.authorName || 'Anonymous'
-  //         }
-  //       };
-  //     });
-
-  //     return processedSimilarBlogs;
-  //   } catch (error) {
-  //     console.error('Error fetching similar blogs:', error);
-  //     toast.error('Failed to fetch similar blogs');
-  //     return [];
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   useEffect(() => {
     const loadInitialData = async () => {

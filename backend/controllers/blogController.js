@@ -143,6 +143,27 @@ const addComment = async (req, res) => {
         blog.comments.push(comment);
         await blog.save();
         res.status(200).json(blog);
+
+        const commentBy = await User.findById(comment?.user);
+        const blogPoster = blog.author;
+            
+            const notificationToAuthor = new Notification({
+              userId: blogPoster,
+              type: 'blog',
+              title: blog.title,
+              message: `${commentBy.name} commented on your blog`,
+              sourceId: blog._id,
+              refModel: 'Blog',
+              sourceName: commentBy.name
+            });
+            
+            const savedAuthorNotification = await notificationToAuthor.save();
+            
+           
+            if (req.app.io) {
+              req.app.io.to(`user-${blogPoster}`).emit('new_notification', savedAuthorNotification);
+            }
+
     } catch (error) {
         res.status(500).json({ error: "Error commenting on blog" });
     }

@@ -35,7 +35,7 @@ export const Sidebar = () => {
             alignItems: 'flex-start',
             padding: '16px',
           }}
-          role="presentation"
+          // role="presentation"
           onClick={toggleDrawer(false)}
           onKeyDown={toggleDrawer(false)}
         >
@@ -130,7 +130,7 @@ export const Sidebar = () => {
             </ListItem>
 </Link>
            
-<Link to='/connect'>
+<Link to='/chatPortal'>
 <ListItem button className="cursor-pointer" style={{ padding: '16px 0' }}>
               <FontAwesomeIcon icon={faComment} className="text-white mr-3" />
               <ListItemText

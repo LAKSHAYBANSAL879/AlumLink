@@ -201,7 +201,7 @@ function Navbar() {
                 navigate(`/blogPortal`);
                 break;
             case 'chat':
-                navigate(`/chat/${notification.sourceId}`);
+                navigate(`/chatPortal`);
                 break;
             default:
                 
@@ -211,9 +211,9 @@ function Navbar() {
     
     return (
         <div>
-            <nav className="bg-gray-900 sticky top-0 z-20 border-gray-200">
-                <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-4">
-                    <div className="flex justify-center align-middle text-center -ml-20">
+            <nav className="bg-sticky top-0 z-20 border-gray-200"   style={{ backgroundColor: '#191919' }}>
+                <div className="w-full flex items-center justify-between mx-auto px-4">
+                    <div className="flex justify-center align-middle text-center ">
                         <div className="flex align-middle my-auto"><Sidebar /></div>
                         <a href="/" className="flex items-center space-x-3 -ml-18">
                             <div className="flex items-center justify-center">

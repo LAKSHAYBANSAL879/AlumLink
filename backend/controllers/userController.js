@@ -102,6 +102,7 @@ exports.signin = async (req, res) => {
       const token = jwt.sign({ userId: user._id,name: user.name  }, process.env.SECRET, {
         expiresIn: "1d",
       });
+      await User.findByIdAndUpdate(user._id, { online: true });
       return res.status(200).json({
         success: true,
         message: 'User signed in successfully',
@@ -139,6 +140,8 @@ exports.signin = async (req, res) => {
       const token = jwt.sign({ userId: user._id,name: user.name  }, process.env.SECRET, {
         expiresIn: "1d",
       });
+      await User.findByIdAndUpdate(user._id, { online: true });
+
       return res.status(200).json({
         success: true,
         message: 'User signed in successfully',
@@ -162,27 +165,33 @@ exports.signin = async (req, res) => {
   };
   
 // Logout User
-exports.userLogout = (req, res, next) => {
-    try {
-      const cookieOptions = {
-        expires: new Date(0), 
-        httpOnly: true,
-      };
-  
-      res.cookie("token", null, cookieOptions);
-      
-      res.status(200).json({
-        success: true,
-        message: "User logged out successfully",
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-  };
-
+exports.userLogout = async (req, res, next) => {
+  try {
+   
+    const {userId} = req.params;
+    
+    // Update user's online status to false
+    await User.findByIdAndUpdate(userId, { online: false });
+    
+    // Clear the cookie
+    const cookieOptions = {
+      expires: new Date(0),
+      httpOnly: true,
+    };
+    
+    res.cookie("token", null, cookieOptions);
+    
+    res.status(200).json({
+      success: true,
+      message: "User logged out successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 // Get Single User
 exports.getuser = async (req, res) => {
     try {

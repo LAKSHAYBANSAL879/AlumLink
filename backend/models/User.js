@@ -67,9 +67,15 @@ type:String
         default: false
     },
     savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
-    savedBlogs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Blog' }]
-
-
+    savedBlogs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Blog' }],
+    online: {
+      type: Boolean,
+      default: false
+  },
+  contacts: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+  }],
 });
 userSchema.pre('save',async function (next){
     if(!this.isModified('password'))

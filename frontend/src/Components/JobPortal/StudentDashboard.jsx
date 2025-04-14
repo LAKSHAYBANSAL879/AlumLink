@@ -30,7 +30,7 @@ const StudentDashboard = () => {
       try {
         if (!userId) return;
         
-        const response = await axios.post('http://localhost:8080/api/v1/application/getAppliedJobs', { userId });
+        const response = await axios.post('https://alumlink-ruo3.onrender.com/api/v1/application/getAppliedJobs', { userId });
         setAppliedJobs(response.data.appliedJobs);
       } catch (error) {
         console.error('Error fetching applied jobs:', error);
@@ -106,7 +106,7 @@ const StudentDashboard = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/v1/jobs/all'); 
+        const response = await axios.get('https://alumlink-ruo3.onrender.com/api/v1/jobs/all'); 
         setJobsData(response.data.slice(0,5));
        
       } catch (error) {
@@ -159,7 +159,7 @@ const StudentDashboard = () => {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8080/api/v1/auth/getSavedJobs', {
+      const response = await fetch('https://alumlink-ruo3.onrender.com/api/v1/auth/getSavedJobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),

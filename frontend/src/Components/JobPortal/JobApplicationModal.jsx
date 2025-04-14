@@ -83,7 +83,7 @@ console.log(jobData?._id,userData?._id);
       submitData.append("resume", formData.resume);
       submitData.append("coverLetter", formData.coverLetter);
 
-      const response = await fetch("http://localhost:8080/api/v1/application/apply", {
+      const response = await fetch("https://alumlink-ruo3.onrender.com/api/v1/application/apply", {
         method: "POST",
         body: submitData,
       });

@@ -25,7 +25,7 @@ const HrDashboard = () => {
 
   const fetchApplications = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/api/v1/application/getApplicationEmployer',
+      const response = await axios.post('https://alumlink-ruo3.onrender.com/api/v1/application/getApplicationEmployer',
         { userId },
         {
           headers: {
@@ -97,7 +97,7 @@ const HrDashboard = () => {
   useEffect(() => {
     const fetchPostedJobs = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/v1/jobs/getPostedJobs', {
+        const response = await fetch('https://alumlink-ruo3.onrender.com/api/v1/jobs/getPostedJobs', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: user?._id }),

@@ -74,7 +74,7 @@ function Navbar() {
     const fetchNotifications = async () => {
         const userId=user?._id;
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/notification/${userId}?limit=7`, {
+            const response = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/notification/${userId}?limit=7`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -93,7 +93,7 @@ function Navbar() {
     
     const markAsRead = async (id) => {
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/notification/${id}/read`, {
+            const response = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/notification/${id}/read`, {
                 method: 'PUT'
             });
             
@@ -114,7 +114,7 @@ function Navbar() {
     const markAllAsRead = async () => {
         const userId=user?._id;
         try {
-            const response = await fetch(`http://localhost:8080/api/v1/notification/${userId}/read-all`, {
+            const response = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/notification/${userId}/read-all`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -307,7 +307,7 @@ function Navbar() {
                                     title="Go to Profile"
                                 >
                                     <img
-                                        src={`http://localhost:8080/api/v1/auth/uploadss/${user?.profileImageUrl}`}
+                                        src={`https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${user?.profileImageUrl}`}
                                         alt="Profile"
                                         className="w-16 h-16 rounded-full border-2 border-white"
                                     />

@@ -41,7 +41,7 @@ const UserList = () => {
         bgcolor: '#f8f8f8',
         borderBottom: '1px solid #e0e0e0'
       }}>
-        <Avatar src={`http://localhost:8080/api/v1/auth/uploadss/${user?.profileImageUrl}`} />
+        <Avatar src={`https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${user?.profileImageUrl}`} />
         <Box sx={{ ml: 2, flexGrow: 1 }}>
           <Typography variant="subtitle1" fontWeight="bold">{user?.name || 'User'}</Typography>
           <Typography variant="caption" color="text.secondary">{user?.email || 'Loading...'}</Typography>
@@ -185,7 +185,7 @@ const UserList = () => {
                   },
                 }}
               >
-                 <Avatar src={`http://localhost:8080/api/v1/auth/uploadss/${contact?.profileImageUrl}`} alt={contact?.name}/>
+                 <Avatar src={`https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${contact?.profileImageUrl}`} alt={contact?.name}/>
               </Badge>
             </ListItemAvatar>
             <ListItemText 
@@ -253,7 +253,7 @@ const UserList = () => {
                     },
                   }}
                 >
-                  <Avatar src={`http://localhost:8080/api/v1/auth/uploadss/${user?.profileImageUrl}`} alt={user?.name}/>
+                  <Avatar src={`https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${user?.profileImageUrl}`} alt={user?.name}/>
                 </Badge>
               </ListItemAvatar>
               <ListItemText 

@@ -37,7 +37,7 @@ const DonationDashboard = () => {
 
   const fetchDonations = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/v1/donations/all');
+      const response = await axios.get('https://alumlink-ruo3.onrender.com/api/v1/donations/all');
       setDonationRequests(Array.isArray(response.data) ? response.data : []);
       processCategories(Array.isArray(response.data) ? response.data : [])
       processMonthlyData(Array.isArray(response.data) ? response.data : [])
@@ -57,14 +57,14 @@ const DonationDashboard = () => {
     setIsLoading(true);
     try {
       // Fetch top donors
-      const topDonorsRes = await axios.get('http://localhost:8080/api/v1/donations/top-donors');
+      const topDonorsRes = await axios.get('https://alumlink-ruo3.onrender.com/api/v1/donations/top-donors');
       setTopDonors(topDonorsRes.data.topDonors.map(donor => ({
         name: donor.donor,
         amount: donor.totalDonated
       })));
 
       // Fetch my donation requests
-      const myRequestsRes = await axios.get(`http://localhost:8080/api/v1/donations/my-requests/${userId}`);
+      const myRequestsRes = await axios.get(`https://alumlink-ruo3.onrender.com/api/v1/donations/my-requests/${userId}`);
       // console.log("my requests rep is",myRequestsRes)
       setMyRecentRequests(myRequestsRes.data.map(request => ({
         title: request.title,
@@ -75,7 +75,7 @@ const DonationDashboard = () => {
       })).slice(0, 4)); 
 
       // Fetch my donations
-      const myDonationsRes = await axios.get(`http://localhost:8080/api/v1/donations/my-donations/${userId}`);
+      const myDonationsRes = await axios.get(`https://alumlink-ruo3.onrender.com/api/v1/donations/my-donations/${userId}`);
       setMyRecentDonations(myDonationsRes.data.map(donation => ({
         title: donation.donationRequest.title,
         recipient: donation.donationRequest.createdBy?.name || 'Anonymous',

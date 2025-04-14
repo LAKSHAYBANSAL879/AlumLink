@@ -40,7 +40,7 @@ const DonationPortal = () => {
 const fetchDonations = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:8080/api/v1/donations/all');
+      const response = await axios.get('https://alumlink-ruo3.onrender.com/api/v1/donations/all');
       
       const currentDate = new Date();
       const filteredDonations = Array.isArray(response.data) 
@@ -65,7 +65,7 @@ const fetchDonations = async () => {
 
   const handleExpiredRequest = async (requestId) => {
     try {
-      await axios.delete(`http://localhost:8080/api/v1/donations/${requestId}/deleteExp`);
+      await axios.delete(`https://alumlink-ruo3.onrender.com/api/v1/donations/${requestId}/deleteExp`);
       fetchDonations();
     } catch (error) {
       console.error("Error handling expired request:", error);
@@ -110,7 +110,7 @@ const fetchDonations = async () => {
   };
 
   const handleDownload = (documentName) => {
-    const fileUrl = `http://localhost:8080/api/v1/donations/${documentName}`;
+    const fileUrl = `https://alumlink-ruo3.onrender.com/api/v1/donations/${documentName}`;
     window.open(fileUrl, '_blank');
   };
 
@@ -132,7 +132,7 @@ const fetchDonations = async () => {
     try {
       const requestId=currentRequestForStatus?._id;
       const response = await axios.put(
-        `http://localhost:8080/api/v1/donations/${requestId}/status`,
+        `https://alumlink-ruo3.onrender.com/api/v1/donations/${requestId}/status`,
         {
           status: selectedStatus,
           adminRemarks: adminRemarks,

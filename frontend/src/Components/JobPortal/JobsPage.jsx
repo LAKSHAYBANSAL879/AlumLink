@@ -18,7 +18,7 @@ export default function JobsPage() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/v1/jobs/all'); 
+        const response = await axios.get('https://alumlink-ruo3.onrender.com/api/v1/jobs/all'); 
         console.log("job data is",response.data);
         setJobsData(response.data);
       } catch (error) {

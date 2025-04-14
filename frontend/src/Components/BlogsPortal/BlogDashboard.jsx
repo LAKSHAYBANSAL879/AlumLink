@@ -61,7 +61,7 @@ const BlogDashboard = () => {
     try {
       if (!user?._id) return;
 
-      const response = await axios.get(`http://localhost:8080/api/v1/blogs/getLikedBlogs/${userId}`);
+      const response = await axios.get(`https://alumlink-ruo3.onrender.com/api/v1/blogs/getLikedBlogs/${userId}`);
       
       const processedLikedBlogs = response.data.map(post => ({
         id: post._id,
@@ -82,7 +82,7 @@ const BlogDashboard = () => {
   const fetchSavedBlogs = async () => {
     try {
       if (!userId) return;
-      const response = await axios.get(`http://localhost:8080/api/v1/auth/getSavedBlogs/${userId}`);
+      const response = await axios.get(`https://alumlink-ruo3.onrender.com/api/v1/auth/getSavedBlogs/${userId}`);
       const processedSavedBlogs = response.data.savedBlogs.map(post => ({
         id: post._id,
         title: post.title,
@@ -102,7 +102,7 @@ const BlogDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`http://localhost:8080/api/v1/blogs/dashboardStats/${userId}`);
+        const response = await axios.get(`https://alumlink-ruo3.onrender.com/api/v1/blogs/dashboardStats/${userId}`);
         
         const data = response.data;
         

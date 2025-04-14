@@ -18,7 +18,7 @@ const JobApplicantsPage = () => {
 
   const fetchApplications = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/application/getApplications/${jobId}`, {
+      const response = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/application/getApplications/${jobId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ const JobApplicantsPage = () => {
   const updateStatus = async (applicationId, newStatus) => {
     setUpdateLoading(applicationId);
     try {
-      const response = await fetch('http://localhost:8080/api/v1/application/update-status', {
+      const response = await fetch('https://alumlink-ruo3.onrender.com/api/v1/application/update-status', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ const JobApplicantsPage = () => {
   const handleFileDownload = (filename, type) => {
     if (!filename) return;
     const baseFilename = filename.replace('uploads/resumes/', '');
-    window.open(`http://localhost:8080/api/v1/application/${baseFilename}`, '_blank');
+    window.open(`https://alumlink-ruo3.onrender.com/api/v1/application/${baseFilename}`, '_blank');
   };
 
   const handleCheckResume = async (resumeFilename, job, applicationId,isAuto=false) => {
@@ -90,7 +90,7 @@ const JobApplicantsPage = () => {
     setCheckingResume(applicationId);
     try {
      
-      const resumeResponse = await fetch(`http://localhost:8080/api/v1/application/${resumeFilename}`);
+      const resumeResponse = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/application/${resumeFilename}`);
       if (!resumeResponse.ok) throw new Error('Failed to fetch resume');
 
       const blob = await resumeResponse.blob();

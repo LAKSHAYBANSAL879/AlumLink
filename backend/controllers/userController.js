@@ -1,7 +1,7 @@
 const User = require('../models/User'); 
 const Job=require('../models/job')
 const Blog=require("../models/blog")
-const Record = require('../models/Record');
+const Record = require('../models/record');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');

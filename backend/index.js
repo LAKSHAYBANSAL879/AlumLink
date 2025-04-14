@@ -7,13 +7,13 @@ const cors = require('cors');
 const crypto = require('crypto');
 const connectDB = require("./config/database.js");
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const User = require('./models/User.js');
 const http = require('http');
 const socketIO = require('socket.io');
 const { initializeSocket } = require('./socket.js');
 
 dotenv.config();
-
 connectDB();
 
 const app = express();
@@ -27,21 +27,29 @@ const io = socketIO(server, {
 
 // Initialize Socket.IO
 const { connectedUsers } = initializeSocket(io);
-
-// Make io accessible in routes
 global.io = io;
 
 app.use(cookieParser());
-
 app.use(cors({ origin: "*", credentials: true }));
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// ✅ MongoDB session store setup
 app.use(session({
-  secret: 'ASDFGHJKL', 
+  secret: process.env.SESSION_SECRET || 'ASDFGHJKL',
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false },
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URL,
+    ttl: 14 * 24 * 60 * 60, // 14 days
+    collectionName: 'sessions'
+  }),
+  cookie: {
+    secure: process.env.NODE_ENV === 'production', 
+    maxAge: 1000 * 60 * 60 * 24 * 7, 
+    sameSite: 'lax'
+  }
 }));
 
 // Routes
@@ -53,7 +61,6 @@ app.use("/api/v1/notification", require("./routes/notificationRoutes.js"));
 app.use("/api/v1/blogs", require("./routes/blogRoutes.js"));
 app.use("/api/v1/messages", require("./routes/messageRoutes.js"));
 
-
 // Ensure admin exists
 (async () => {
   try {
@@ -64,10 +71,8 @@ app.use("/api/v1/messages", require("./routes/messageRoutes.js"));
   }
 })();
 
-// Set the port
+// Start the server
 const PORT = process.env.PORT || 8080;
-
-// Start the server (changed from app.listen to server.listen for Socket.IO)
 server.listen(PORT, () => {
   console.log(`Node Server Running On Port ${PORT}`);
 });

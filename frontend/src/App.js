@@ -17,6 +17,7 @@ import BlogHome from './Components/BlogsPortal/BlogHome';
 import BlogIndividual from './Components/BlogsPortal/BlogIndividual';
 import ChatPortal from './Components/ChatPortal/ChatPortal';
 import { ChatProvider } from './Components/ChatPortal/ChatContext';
+import ProtectedRoute from './ProtectedRoutes';
 
 
 function App() {
@@ -32,15 +33,15 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/profile' element={<ProfilePage />} />
           <Route path='/forgot' element={<ForgotPassword />} />
+          <Route element={<ProtectedRoute/>}>
           <Route path='/jobPortal' element={<JobHome />} />
           <Route path='/jobDesc/:jobId' element={<JobDescription />} />
           <Route path='/job-applications/:jobId' element={<JobApplicantsPage />} />
           <Route path='/donationPortal' element={<DonationHome />} />
           <Route path='/blogs' element={<BlogHome />} />
           <Route path='/blogIndi/:blogId' element={<BlogIndividual/>} />
-          
           <Route path='/chatPortal' element={<ChatPortal />} />
-          
+          </Route>
          
 
 

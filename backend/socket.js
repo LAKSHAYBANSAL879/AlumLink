@@ -127,7 +127,7 @@ function initializeSocket(io) {
         
         // Get current time
         const now = new Date();
-        const time = now.toLocaleTimeString('en-US', { 
+        const time = now.toLocaleTimeString('en-IN', { 
           hour: '2-digit', 
           minute: '2-digit',
           hour12: false

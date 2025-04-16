@@ -18,6 +18,7 @@ import BlogIndividual from './Components/BlogsPortal/BlogIndividual';
 import ChatPortal from './Components/ChatPortal/ChatPortal';
 import { ChatProvider } from './Components/ChatPortal/ChatContext';
 import ProtectedRoute from './ProtectedRoutes';
+import { ToastContainer } from 'react-toastify';
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
       <ChatProvider>
 <GoogleOAuthProvider clientId="87101963486-mo1s5h89e0dahlfiotqubus9qfgs5rpe.apps.googleusercontent.com">
       <div className="App">
+      <ToastContainer position="top-right" autoClose={3000} />
         <Navbar />
         <Routes>
         <Route path='/' element={<Home />} />

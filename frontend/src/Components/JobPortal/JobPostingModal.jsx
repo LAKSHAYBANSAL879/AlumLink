@@ -8,6 +8,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider/LocalizationProvider';
 import dayjs from 'dayjs';
+import { toast } from 'react-toastify';
 
 Modal.setAppElement('#root');
 
@@ -80,8 +81,8 @@ const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        if (!formData.title || !formData.category || !formData.company || !formData.experienceLevel || !formData.applicationDeadline || !formData.employmentType) {
-            alert("Please fill all required fields.");
+        if (!formData.title || !formData.category || !formData.company || !formData.experienceLevel || !formData.applicationDeadline || !formData.employmentType || !formData.location || !formData.skillsRequired) {
+            toast.warning("Please fill all required fields.");
             return;
         }
     
@@ -101,11 +102,11 @@ const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
             }
     
             const result = await response.json();
-            console.log("Job posted successfully:", result);
+            toast.success("Job posted successfully:");
             resetForm();
             onClose();
         } catch (error) {
-            console.error("Error posting job:", error);
+            toast.error("Error posting job:", error);
             alert("Error posting job. Please try again.");
         } finally {
             setLoading(false);

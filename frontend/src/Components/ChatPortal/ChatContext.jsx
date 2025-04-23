@@ -461,9 +461,7 @@ if (filesToSend[0].isAudio) {
 } else if (firstFile.type?.startsWith('video/')) {
   mediaType = 'video';
 }
-else{
-  mediaType='file'
-;}
+
 
 formData.append('mediaType', mediaType);
 

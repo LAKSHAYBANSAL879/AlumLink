@@ -196,7 +196,7 @@ const fetchBlogs = async () => {
       }));
 
       // Call similar blogs endpoint
-      const response = await axios.post('http://localhost:5000/get_similar_blogs', {
+      const response = await axios.post('https://alumlinkpythoncode.onrender.com/get_similar_blogs', {
         all_blogs: processedAllBlogs,
         blog_id: blogId,
         top_n: 5

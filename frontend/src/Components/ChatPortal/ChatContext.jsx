@@ -316,7 +316,7 @@ export const ChatProvider = ({ children }) => {
         if (selectedChat) {
           const updatedSelectedChat = contactsData.find(c => c._id === selectedChat._id);
           if (updatedSelectedChat) {
-            setSelectedChat(updatedSelectedChat); // This will trigger fetchMessages via useEffect
+            setSelectedChat(updatedSelectedChat); 
           }
         }
       };
@@ -461,6 +461,9 @@ if (filesToSend[0].isAudio) {
 } else if (firstFile.type?.startsWith('video/')) {
   mediaType = 'video';
 }
+else{
+  mediaType='file'
+;}
 
 formData.append('mediaType', mediaType);
 

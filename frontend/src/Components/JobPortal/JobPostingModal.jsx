@@ -15,21 +15,21 @@ Modal.setAppElement('#root');
 const employmentTypes = ['Full-time', 'Part-time', 'Internship'];
 const experienceRequireds = ['Fresher', '0-3 years', '3+ years'];
 
-const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
+const JobPostingModal = ({ isOpen, onClose, loggedInUser }) => {
     const initialFormData = {
         title: '',
         category: '',
-        location: [],
+        location: [], 
         company: '',
-        about:'',
-        skillsRequired: [],
+        about: '',
+        skillsRequired: [], 
         description: '',
         experienceLevel: '',
         applicationDeadline: dayjs(),
         salaryRange: '',
         employmentType: '',
-        maxApplicants:1000,
-        companyImageUrl:'',
+        maxApplicants: 1000,
+        companyImageUrl: '',
         postedAt: dayjs().format('YYYY-MM-DD HH:mm:ss'),
         postedBy: loggedInUser?._id,
     };
@@ -38,11 +38,12 @@ const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
     const [inputLocation, setInputLocation] = useState('');
     const [inputSkill, setInputSkill] = useState('');
 
-    const resetForm=()=>{
+    const resetForm = () => {
         setFormData(initialFormData);
         setInputLocation('');
         setInputSkill('');
     }
+    
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -52,19 +53,23 @@ const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
     };
 
     const handleArrayInputChange = (e, field) => {
+        e.preventDefault(); 
+        
         if (field === 'location') {
-            if (inputLocation.trim() && !formData.location.includes(inputLocation.trim())) {
+            const trimmedLocation = inputLocation.trim();
+            if (trimmedLocation && !formData.location.includes(trimmedLocation)) {
                 setFormData((prev) => ({
                     ...prev,
-                    location: [...prev.location, inputLocation.trim()],
+                    location: [...prev.location, trimmedLocation],
                 }));
                 setInputLocation('');
             }
         } else if (field === 'skillsRequired') {
-            if (inputSkill.trim() && !formData.skillsRequired.includes(inputSkill.trim())) {
+            const trimmedSkill = inputSkill.trim();
+            if (trimmedSkill && !formData.skillsRequired.includes(trimmedSkill)) {
                 setFormData((prev) => ({
                     ...prev,
-                    skillsRequired: [...prev.skillsRequired, inputSkill.trim()],
+                    skillsRequired: [...prev.skillsRequired, trimmedSkill],
                 }));
                 setInputSkill('');
             }
@@ -81,8 +86,18 @@ const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        if (!formData.title || !formData.category || !formData.company || !formData.experienceLevel || !formData.applicationDeadline || !formData.employmentType || !formData.location || !formData.skillsRequired) {
-            toast.warning("Please fill all required fields.");
+        
+        if (
+            !formData.title || 
+            !formData.category || 
+            !formData.company || 
+            !formData.experienceLevel || 
+            !formData.applicationDeadline || 
+            !formData.employmentType || 
+            formData.location.length === 0 || 
+            formData.skillsRequired.length === 0
+        ) {
+            toast.warning("Please fill all required fields. Location and Skills must have at least one value.");
             return;
         }
     
@@ -102,15 +117,27 @@ const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
             }
     
             const result = await response.json();
-            toast.success("Job posted successfully:");
+            toast.success("Job posted successfully");
             resetForm();
             onClose();
         } catch (error) {
-            toast.error("Error posting job:", error);
+            toast.error("Error posting job");
             alert("Error posting job. Please try again.");
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleKeyDown = (e, field) => {
+        
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleArrayInputChange(e, field);
+        }
+    };
+
+    const addItem = (field) => {
+        handleArrayInputChange({ preventDefault: () => {} }, field);
     };
 
     return (
@@ -140,33 +167,64 @@ const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
                     <TextField fullWidth label="Maximum Applicants allowed" name="maxApplicants" value={formData.maxApplicants} onChange={handleInputChange} required />
                     <TextField fullWidth label="Company logo URL" name="companyImageUrl" value={formData.companyImageUrl} onChange={handleInputChange} required />
 
-                    <TextField
-                        fullWidth
-                        label="Add Location"
-                        value={inputLocation}
-                        onChange={(e) => setInputLocation(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleArrayInputChange(e, 'location')}
-                        placeholder="Press Enter to add"
-                    />
+                    <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1 }}>
+                        <TextField
+                            fullWidth
+                            label="Add Location"
+                            value={inputLocation}
+                            onChange={(e) => setInputLocation(e.target.value)}
+                            onKeyDown={(e) => handleKeyDown(e, 'location')}
+                            placeholder="Type and press Enter to add"
+                        />
+                        <Button 
+                            variant="contained" 
+                            onClick={() => addItem('location')}
+                            disabled={!inputLocation.trim()}
+                        >
+                            Add
+                        </Button>
+                    </Box>
+                    
                     <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
-                        {formData.location.map((loc) => (
-                            <Chip key={loc} label={loc} onDelete={() => handleChipDelete(loc, 'location')} />
-                        ))}
+                        {formData.location.length > 0 ? (
+                            formData.location.map((loc) => (
+                                <Chip key={loc} label={loc} onDelete={() => handleChipDelete(loc, 'location')} />
+                            ))
+                        ) : (
+                            <Typography variant="caption" color="text.secondary">
+                                No locations added yet. Add at least one location.
+                            </Typography>
+                        )}
                     </Box>
 
+                    <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1 }}>
+                        <TextField
+                            fullWidth
+                            label="Add Skills Required"
+                            value={inputSkill}
+                            onChange={(e) => setInputSkill(e.target.value)}
+                            onKeyDown={(e) => handleKeyDown(e, 'skillsRequired')}
+                            placeholder="Type and press Enter to add"
+                        />
+                        <Button 
+                            variant="contained" 
+                            onClick={() => addItem('skillsRequired')}
+                            disabled={!inputSkill.trim()}
+                        >
+                            Add
+                        </Button>
+                    </Box>
                     
-                    <TextField
-                        fullWidth
-                        label="Add Skills Required"
-                        value={inputSkill}
-                        onChange={(e) => setInputSkill(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleArrayInputChange(e, 'skillsRequired')}
-                        placeholder="Press Enter to add"
-                    />
                     <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
-                        {formData.skillsRequired.map((skill) => (
-                            <Chip key={skill} label={skill} onDelete={() => handleChipDelete(skill, 'skillsRequired')} />
-                        ))}
+                        {formData.skillsRequired.length > 0 ? (
+                            formData.skillsRequired.map((skill) => (
+                                <Chip key={skill} label={skill} onDelete={() => handleChipDelete(skill, 'skillsRequired')} />
+                            ))
+                        ) : (
+                            <Typography variant="caption" color="text.secondary">
+                                No skills added yet. Add at least one skill.
+                            </Typography>
+                        )}
                     </Box>
 
                     <TextField
@@ -180,10 +238,9 @@ const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
                         required
                     />
 
-                    
                     <TextField
                         fullWidth
-                        label=""
+                        label="Experience Required"
                         name="experienceLevel"
                         select
                         value={formData.experienceLevel}
@@ -199,7 +256,6 @@ const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
                         ))}
                     </TextField>
 
-                    
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
                             label="Application Deadline"
@@ -211,10 +267,9 @@ const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
 
                     <TextField fullWidth label="Salary Range (e.g., $50k - $70k)" name="salaryRange" value={formData.salaryRange} onChange={handleInputChange} />
 
-                 
                     <TextField
                         fullWidth
-                        label=""
+                        label="Employment Type"
                         name="employmentType"
                         select
                         value={formData.employmentType}
@@ -231,7 +286,7 @@ const JobPostingModal = ({ isOpen, onClose,loggedInUser }) => {
                     </TextField>
 
                     <Box display="flex" justifyContent="flex-end" gap={2}>
-                        <Button onClick={() => { resetForm(); onClose();}}variant="outlined" color="warning">
+                        <Button onClick={() => { resetForm(); onClose();}} variant="outlined" color="warning">
                             Cancel
                         </Button>
                         <Button type="submit" variant="contained" color="primary" disabled={loading}>

@@ -74,7 +74,7 @@ const BlogPortal = () => {
   
       const response = await axios.get(`https://alumlink-ruo3.onrender.com/api/v1/blogs/getLikedBlogs/${userId}`);
       
-      // Process liked blogs to match recommendation requirements
+     
       const processedLikedBlogs = response.data.map(blog => ({
         id: blog._id,
         title: blog.title,
@@ -97,14 +97,14 @@ const BlogPortal = () => {
     try {
       const likedBlogsToUse = likedBlogs;
       
-      // Ensure we have both all blogs and liked blogs
+      
       if (!allBlogs.length || !likedBlogsToUse.length) {
         toast.info('Not enough data for recommendations');
         setIsLoading(false);
         return;
       }
 
-      // Prepare blogs for recommendation
+     
       const processedAllBlogs = allBlogs.map(blog => ({
         id: blog._id,
         title: blog.title,
@@ -113,16 +113,16 @@ const BlogPortal = () => {
         content: blog.content
       }));
 
-      // Call recommendation endpoint
-      const response = await axios.post('http://localhost:5000/get_recommendations', {
+      
+      const response = await axios.post('https://alumlinkpythoncode.onrender.com/get_recommendations', {
         all_blogs: processedAllBlogs,
         liked_blogs: likedBlogsToUse,
         top_n: 5
       });
 
-      // Process recommended blogs to match existing blog structure
+      
       const processedRecommendedBlogs = response.data.map(blog => {
-        // Find the original blog to get full details
+        
         const originalBlog = allBlogs.find(b => b._id === blog.id) || {};
         
         return {
@@ -141,7 +141,7 @@ const BlogPortal = () => {
 
       setRecommendedBlogs(processedRecommendedBlogs);
 
-      // Update blog interactions for recommended blogs
+      
       const recommendedInteractions = processedRecommendedBlogs.reduce((acc, blog) => {
         if (!blogInteractions[blog.id]) {
           acc[blog.id] = {
@@ -161,7 +161,7 @@ const BlogPortal = () => {
 
     } catch (error) {
       console.error('Error fetching recommendations:', error);
-      toast.error('Failed to fetch personalized recommendations');
+      // toast.error('Failed to fetch personalized recommendations');
       setRecommendedBlogs([]);
     } finally {
       setIsLoading(false);
@@ -237,14 +237,14 @@ const BlogPortal = () => {
         }
       }));
       
-      // Refresh liked blogs after like/unlike
+      
       if (!isLiked) {
         const updatedLikedBlogs = await fetchLikedBlogs();
         if (updatedLikedBlogs.length > 0) {
           await fetchRecommendations(updatedLikedBlogs);
         }
       } else {
-        // If a blog was unliked, also update recommendations
+      
         const updatedLikedBlogs = await fetchLikedBlogs();
         if (updatedLikedBlogs.length > 0) {
           await fetchRecommendations(updatedLikedBlogs);
@@ -290,22 +290,23 @@ const BlogPortal = () => {
   };
 
   const handleReadMoreClick = async (blog) => {
-    // If we're in the regular blog view, try to fetch similar blogs first
+    
     try {
       if (activeTab !== 'recommended' && activeTab !== 'similar') {
-        // You could store these in state or pass them as navigation state to use on the blog detail page
-        // const similarBlogs = await fetchSimilarBlogs(blog.id);
-        
-        // Optionally store in localStorage to access in the blog detail page
-        // if (similarBlogs.length > 0) {
-        //   localStorage.setItem('similarBlogs', JSON.stringify(similarBlogs));
-        // }
+       
       }
     } catch (error) {
       console.error('Error fetching similar blogs before navigation:', error);
     }
     
     navigate(`/blogIndi/${blog.id}`);
+  };
+  const getBlogCoverPhotoUrl = (coverPhoto) => {
+    if (!coverPhoto) return DEFAULT_BLOG_IMAGE;
+    if (coverPhoto.startsWith('http://') || coverPhoto.startsWith('https://')) {
+      return coverPhoto;
+    }
+    return `https://alumlink-ruo3.onrender.com/api/v1/blogs/uploadss/${coverPhoto}`;
   };
 
   return (
@@ -402,7 +403,7 @@ const BlogPortal = () => {
                     
                     <div className="mb-4 mt-2 rounded-lg overflow-hidden">
                       <img 
-                        src={blog?.coverPhoto ? `https://alumlink-ruo3.onrender.com/api/v1/blogs/uploadss/${blog.coverPhoto}` : DEFAULT_BLOG_IMAGE}
+                        src={getBlogCoverPhotoUrl(blog?.coverPhoto)}
                         alt={blog.title}
                         className="w-3/4 lg:h-48 h-max-1/2 mx-auto object-cover rounded-lg"
                       />

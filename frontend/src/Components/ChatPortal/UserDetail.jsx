@@ -22,7 +22,7 @@ const UserDetail = () => {
   ? `College: ${selectedChat?.collegeName || 'N/A'}\nSemester: ${selectedChat?.currentSemester || 'N/A'}\nBranch: ${selectedChat?.branch || 'N/A'}`
   : isAlumnus
   ? `Company: ${selectedChat?.workingOrganisation || 'N/A'}\nPosition: ${selectedChat?.position || 'N/A'}`
-  : "No additional details availa";
+  : "No additional details available";
 
   return (
     <Paper sx={{ width: 320, display: 'flex', flexDirection: 'column', borderRadius: 0 }}>

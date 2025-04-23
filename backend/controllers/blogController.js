@@ -6,8 +6,8 @@ const Notification = require('../models/notification');
 const createBlog = async (req, res) => {
     try {
         const { title, subtitle, content, category, author } = req.body;
-        const coverPhoto = req.file ? req.file.filename : null;
-
+        const coverPhoto = req.file ? req.file.path : null;
+        
         const blog = new Blog({ title, subtitle, content, category, coverPhoto, author });
         await blog.save();
         res.status(201).json(blog);

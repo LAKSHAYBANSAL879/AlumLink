@@ -104,7 +104,7 @@ const DonationDashboard = () => {
         return acc;
       }, {});
       
-      // Convert to array format for pie chart
+      
       const categoryDataArray = Object.entries(categoryCounts).map(([name, value]) => ({ 
         name, 
         value,

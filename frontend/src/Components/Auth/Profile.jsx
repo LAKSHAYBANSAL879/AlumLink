@@ -7,7 +7,7 @@ import { faEdit, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import Cookies from "js-cookie";
 import { Navigate, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+const DEFAULT_USER="https://img.icons8.com/?size=100&id=13042&format=png&color=000000";
 const ProfilePage = () => {
   const { user, setUser } = useContext(UserContext);
   const [profileImage, setProfileImage] = useState(null);
@@ -89,7 +89,13 @@ const ProfilePage = () => {
       toast.error("Failed to update profile");
     }
   };
-
+  const getBlogCoverPhotoUrl = (coverPhoto) => {
+       if(!coverPhoto) return DEFAULT_USER;
+    if (coverPhoto.startsWith('http://') || coverPhoto.startsWith('https://')) {
+      return coverPhoto;
+    }
+    return `https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${coverPhoto}`;
+  };
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <Card className="max-w-3xl mx-auto shadow-lg">
@@ -99,7 +105,7 @@ const ProfilePage = () => {
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative">
                 <Avatar
-                  src={`https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${user?.profileImageUrl}`}
+                  src={getBlogCoverPhotoUrl(user?.profileImageUrl)}
                   alt={userDetails.name}
                   sx={{ width: 120, height: 120 }}
                   className="border-4 border-white shadow-lg"

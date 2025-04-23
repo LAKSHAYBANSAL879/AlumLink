@@ -109,11 +109,32 @@ const fetchDonations = async () => {
     return remaining > 0 ? remaining : 0;
   };
 
-  const handleDownload = (documentName) => {
-    const fileUrl = `https://alumlink-ruo3.onrender.com/api/v1/donations/${documentName}`;
-    window.open(fileUrl, '_blank');
+  const handleDownload = (documentPath) => {
+   
+    if (documentPath.startsWith('http://') || documentPath.startsWith('https://')) {
+     
+      window.open(documentPath, '_blank');
+    } else {
+      
+      const fileUrl = `https://alumlink-ruo3.onrender.com/api/v1/donations/${documentPath}`;
+      window.open(fileUrl, '_blank');
+    }
   };
-
+  const getDocumentDisplayName = (documentPath, index) => {
+    
+    if (documentPath.startsWith('http://') || documentPath.startsWith('https://')) {
+      
+      const parts = documentPath.split('/');
+      const filename = parts[parts.length - 1];
+      const extension = filename.split('.').pop();
+      
+      
+      return `Document ${index + 1}.${extension}`;
+    } else {
+      
+      return documentPath.split('\\').pop().split('-').slice(1).join('-');
+    }
+  };
   const openStatusDialog = (request) => {
     setCurrentRequestForStatus(request);
     setSelectedStatus(request.status || 'pending');
@@ -319,7 +340,7 @@ const fetchDonations = async () => {
                             <DocumentIcon />
                           </ListItemIcon>
                           <ListItemText 
-                            primary={doc.split('\\').pop().split('-').slice(1).join('-')}
+                            primary={getDocumentDisplayName(doc,index)}
                           />
                         </ListItem>
                       ))}

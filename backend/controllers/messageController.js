@@ -38,7 +38,7 @@ exports.sendMessage = async (req, res) => {
       unreadCounts.set(receiverId.toString(), currentCount + 1);
       chat.unreadCounts = unreadCounts;
     }
-    const mediaUrls = req.files ? req.files.map(file => file.filename) : [];
+    const mediaUrls = req.files ? req.files.map(file => file.path) : [];
 
     // Create new message
     const message = await Message.create({

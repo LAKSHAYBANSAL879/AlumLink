@@ -22,7 +22,7 @@ const messageSchema = new mongoose.Schema({
   },
   mediaType: {
     type: String,
-    enum: ["text", "emoji", "image", "video","audio"],
+    enum: ["text", "emoji", "image", "video","audio",'file'],
     default:"text"
   },
   mediaUrls:[{

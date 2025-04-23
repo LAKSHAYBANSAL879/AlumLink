@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, ChevronDown, FileText } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const JobApplicantsPage = () => {
   const [applications, setApplications] = useState([]);
@@ -75,15 +76,40 @@ const JobApplicantsPage = () => {
     }
   };
 
-  const handleFileDownload = (filename, type) => {
-    if (!filename) return;
-    const baseFilename = filename.replace('uploads/resumes/', '');
+  const getFileUrl = (fileUrl) => {
+    if (!fileUrl) return null;
+    
+   
+    if (fileUrl.startsWith('http://') || fileUrl.startsWith('https://')) {
+      return fileUrl;
+    }
+    
+    
+    const baseFilename = fileUrl.includes('uploads/resumes/') 
+      ? fileUrl.replace('uploads/resumes/', '') 
+      : fileUrl;
+      
+    return `https://alumlink-ruo3.onrender.com/api/v1/application/${baseFilename}`;
+  };
+
+  const handleFileDownload = (fileUrl) => {
+    if (!fileUrl) return;
+    
+  
+    if (fileUrl.startsWith('https://')) {
+      window.open(fileUrl, '_blank');
+      return;
+    }
+    
+   else{
+    const baseFilename = fileUrl.replace('uploads/resumes/', '');
     window.open(`https://alumlink-ruo3.onrender.com/api/v1/application/${baseFilename}`, '_blank');
+   }
   };
 
   const handleCheckResume = async (resumeFilename, job, applicationId,isAuto=false) => {
     if (!resumeFilename) {
-      alert('No resume available');
+      toast.error('No resume available');
       return;
     }
 
@@ -102,7 +128,7 @@ const JobApplicantsPage = () => {
       const lowercaseSkills = job?.skillsRequired?.map(skill => skill.toLowerCase()) || [];
       formData.append("job_skills", lowercaseSkills.join(','));
 
-      const flaskResponse = await fetch('http://127.0.0.1:5000/check_resume', {
+      const flaskResponse = await fetch('https://alumlinkpythoncode.onrender.com/check_resume', {
         method: 'POST',
         body: formData,
       });
@@ -125,7 +151,7 @@ const JobApplicantsPage = () => {
     } catch (err) {
       if (!isAuto) alert('Error checking resume');
       console.error('Error checking resume:', err);
-      alert(err.message || 'Error checking resume');
+      toast.error(err.message || 'Error checking resume');
     } finally {
       setCheckingResume(null);
     }

@@ -11,6 +11,7 @@ import { ChatContext } from './ChatContext';
 import EmojiPicker from 'emoji-picker-react';
 import MicRecorder from 'mic-recorder-to-mp3';
 import { v4 as uuidv4 } from 'uuid';
+const DEFAULT_USER='https://img.icons8.com/?size=100&id=13042&format=png&color=000000';
 
 // Initialize mic recorder
 const recorder = new MicRecorder({ bitRate: 128 });
@@ -84,7 +85,11 @@ const FileAttachment = ({ mediaUrls, mediaType }) => {
   const isImage = mediaType === 'image';
   const isAudio = mediaType === 'audio';
   const isVideo = mediaType === 'video';
+  const isFile = mediaType === 'file' || mediaType === 'pdf';
   const fileName = url.split('/').pop();
+  const handleFileClick = () => {
+    window.open(url, '_blank');
+  };
   
   return (
     <Box sx={{ mt: 1 }}>
@@ -130,8 +135,31 @@ const FileAttachment = ({ mediaUrls, mediaType }) => {
           </Typography>
         </Box>
       )}
-      
-      {!isImage && !isAudio && !isVideo && (
+       {isFile && (
+        <Box 
+          sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            bgcolor: 'rgba(0,0,0,0.05)', 
+            p: 1.5, 
+            borderRadius: 1,
+            cursor: 'pointer',
+            '&:hover': {
+              bgcolor: 'rgba(0,0,0,0.08)',
+            }
+          }}
+          onClick={handleFileClick}
+        >
+          <FileText size={24} style={{ marginRight: '12px', color: mediaType === 'pdf' ? '#F44336' : '#4285F4' }} />
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography variant="body2" fontWeight="medium">{fileName}</Typography>
+            <Typography variant="caption" color="text.secondary">
+              Click to open {mediaType === 'pdf' ? 'PDF' : 'file'}
+            </Typography>
+          </Box>
+        </Box>
+      )}
+      {!isImage && !isAudio && !isVideo && !isFile &&  (
         <Box sx={{ 
           display: 'flex', 
           alignItems: 'center', 
@@ -461,13 +489,24 @@ const ChatWindow = () => {
                           
                          
                           {msg.mediaUrls && msg.mediaUrls.length > 0 && (
-  msg.mediaUrls.map((fileName, idx) => (
-    <FileAttachment
-      key={idx}
-      mediaUrls={[`https://alumlink-ruo3.onrender.com/api/v1/messages/uploads/media/${fileName}`]}
-      mediaType={msg.mediaType}
-    />
-  ))
+  msg.mediaUrls.map((mediaUrl, idx) => {
+    
+    const fullUrl = mediaUrl.startsWith('http') 
+      ? mediaUrl 
+      : `https://alumlink-ruo3.onrender.com/api/v1/messages/uploads/media/${mediaUrl}`;
+    
+    
+    const fileName = mediaUrl.split('/').pop();
+    
+    return (
+      <FileAttachment
+        key={idx}
+        mediaUrls={[fullUrl]}
+        mediaType={msg.mediaType}
+        fileName={fileName}
+      />
+    );
+  })
 )}
                           <Typography 
                             variant="caption" 

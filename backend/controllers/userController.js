@@ -61,7 +61,7 @@ exports.registerUser = async (req, res) => {
         }
 
         
-        const profileImageUrl = req.file ? req.file.filename : null;
+        const profileImageUrl = req.file ? req.file.path : null;
 
        
         const user = await User.create({
@@ -245,7 +245,7 @@ exports.getUniqueCollegeNames = async (req, res) => {
       
       let profileImageUrl;
       if (req.file) {
-        profileImageUrl = req.file.filename;
+        profileImageUrl = req.file.path;
       }
   
       if (!user) {

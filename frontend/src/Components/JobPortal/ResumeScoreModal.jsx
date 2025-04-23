@@ -33,7 +33,7 @@ const ResumeScoreModal = ({ isOpen, onClose, job }) => {
     formData.append("job_skills", lowercaseSkills.join(','));
 
     try {
-      const response = await fetch("http://127.0.0.1:5001/match_resume", {
+      const response = await fetch("https://alumlinkpythoncode.onrender.com/match_resume", {
         method: "POST",
         body: formData,
       });

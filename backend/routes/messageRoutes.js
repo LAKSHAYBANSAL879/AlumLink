@@ -10,25 +10,25 @@ const {
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary =require('cloudinary').v2;
 
-// Ensure upload directory exists
-const uploadDir = 'uploads/media';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
-// Configure multer for file storage
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function(req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'media-' + uniqueSuffix + path.extname(file.originalname));
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: "messages",
+    resource_type: "auto",
   }
 });
 
-// File filter to only allow certain file types
+
 const fileFilter = (req, file, cb) => {
   // Accept images and common file types
   const allowedFileTypes = /jpeg|jpg|png|gif|pdf|doc|docx|xls|xlsx|txt|mp3|mp4|webm|zip/;
@@ -45,7 +45,7 @@ const fileFilter = (req, file, cb) => {
 // Initialize multer with configurations
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // Limit to 10MB
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: fileFilter
 });
 

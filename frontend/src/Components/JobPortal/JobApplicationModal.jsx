@@ -14,6 +14,7 @@ import {
   UploadFile as UploadIcon,
 } from "@mui/icons-material";
 import { FileText } from "lucide-react";
+import { toast } from "react-toastify";
 
 Modal.setAppElement("#root");
 
@@ -93,7 +94,7 @@ console.log(jobData?._id,userData?._id);
         throw new Error(data.message || "Failed to apply for the job.");
       }
 
-      alert("Application submitted successfully!");
+      toast.success("Application submitted successfully!");
       onClose();
     } catch (error) {
       setSubmissionError(error.message);

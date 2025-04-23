@@ -5,7 +5,7 @@ import Sidebar from './Sidebar';
 import { UserContext } from '../../userContext';
 import io from 'socket.io-client';
 import { Bell } from 'lucide-react';
-
+const DEFAULT_USER='https://img.icons8.com/?size=100&id=13042&format=png&color=000000';
 function Navbar() {
     const navigate = useNavigate();
     const { user } = useContext(UserContext); 
@@ -133,6 +133,13 @@ function Navbar() {
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
     };
+    const getBlogCoverPhotoUrl = (profileImageUrl) => {
+       if(!profileImageUrl) return DEFAULT_USER;
+        if (profileImageUrl.startsWith('http://') || profileImageUrl.startsWith('https://')) {
+          return profileImageUrl;
+        }
+        return `https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${profileImageUrl}`;
+      };
     
     const getNotificationContent = (notification) => {
         switch(notification.type) {
@@ -307,7 +314,7 @@ function Navbar() {
                                     title="Go to Profile"
                                 >
                                     <img
-                                        src={`https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${user?.profileImageUrl}`}
+                                        src={getBlogCoverPhotoUrl(user?.profileImageUrl)}
                                         alt="Profile"
                                         className="w-16 h-16 rounded-full border-2 border-white"
                                     />

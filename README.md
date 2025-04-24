@@ -56,7 +56,7 @@
 ### 💖 Donation Portal
 > Give back to the community
 
-- Integrated with **Razorpay** for secure payments.
+- Integrated with **Stripe** for secure payments.
 - User can contribute to various schemes by fellow user
 - Real time staus update by admin if donation request is real or not
 - User can also check request based on provided supported documents 
@@ -116,7 +116,7 @@ Get notified when:
 
 ---
 
-## 💳 Razorpay Test Credentials
+## 💳 Stripe Test Credentials
 Card number: 4000 0035 6000 0008
 
 ## Some enrollment numbers in record needed for new signup
@@ -134,7 +134,7 @@ Card number: 4000 0035 6000 0008
 | **Backend**     | Node.js, Express.js, MongoDB                            |
 | **Auth**        | JWT, Google OAuth2                                      |
 | **Storage**     | Cloudinary (images, files, media)                       |
-| **Payment**     | Razorpay                                                |
+| **Payment**     | Stripe                                                  |
 | **Real-time**   | Socket.IO                                               |
 | **ML/NLP**      | Python (Spacy, NLTK, Scikit-learn)                      |
 | **Hosting**     | Vercel (Frontend), Render (Backend & Socket.IO)         |

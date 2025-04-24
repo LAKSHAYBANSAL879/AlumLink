@@ -190,7 +190,7 @@ concurrently "npm run dev --prefix server" "npm start --prefix client"
 - Commit your changes and open a PR.
 
 ---
-🧑‍💻 Contributors
+## 🧑‍💻 Contributors
 <table> <tr> <td align="center" margin-right="25px"> <a href="https://github.com/lakshaybansal879"> <img src="https://github.com/lakshaybansal879.png" width="100px;" alt="Lakshay Bansal"/><br /> <sub><b>Lakshay Bansal</b></sub><br /> <img src="https://img.shields.io/badge/-Frontend-blue?style=flat-square" /> </a> </td> <td align="center"> <a href="https://github.com/agarwalsa"> <img src="https://github.com/agarwalsa.png" width="100px;" alt="Samarpit Agarwal"/><br /> <sub><b>Samarpit Agarwal</b></sub><br /> <img src="https://img.shields.io/badge/-Backend-green?style=flat-square" /> </a> </td> </tr> </table>
 
 ## 🧩 Future Improvements

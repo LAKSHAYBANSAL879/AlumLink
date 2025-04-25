@@ -79,11 +79,9 @@ function initializeSocket(io) {
     // Authenticate user
     socket.on('authenticate', async (token) => {
       try {
-        // Verify token and get user ID
-        // Use process.env.JWT_SECRET for consistency with your server.js
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || process.env.SECRET);
-        const userId = decoded.id || decoded.userId; // Handle both formats
         
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || process.env.SECRET);
+        const userId = decoded.id || decoded.userId; 
         if (userId) {
           // Store socket information
           connectedUsers.set(userId, socket.id);

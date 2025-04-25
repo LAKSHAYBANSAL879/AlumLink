@@ -31,7 +31,7 @@ const getDashboardStats = async (req, res) => {
       comments: post.comments.length,
     }));
     
-    // Categorization (enhanced with color assignment)
+    // Categorization 
     const categoryData = await Blog.aggregate([
       { $group: { _id: "$category", count: { $sum: 1 } } },
       { $project: { category: "$_id", count: 1, _id: 0 } }

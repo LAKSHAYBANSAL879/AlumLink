@@ -69,7 +69,7 @@ const HomePage = () => {
       };
       const filteredJobs = jobsData.filter(job => 
         (job.postedBy?._id !== user?._id) &&  
-        (!job.appliedDate || new Date(job.appliedDate) >= currentDate));
+        (!job.appliedDate || new Date(job.appliedDate) >= currentDate)).slice(0,3);
   // Hardcoded donations data
     useEffect(() => {
       fetchDonations();
@@ -84,7 +84,7 @@ const HomePage = () => {
           ? response.data.filter(donation => {
               const deadlineDate = new Date(donation.deadline);
               return deadlineDate >= currentDate;
-            })
+            }).slice(0,2)
           : [];
         
         setDonationRequests(filteredDonations);
@@ -92,6 +92,7 @@ const HomePage = () => {
         console.error("error occured")
       } 
     };
+ 
  
   const timeAgo = (postedDate) => {
     if (!postedDate) return "Unknown";

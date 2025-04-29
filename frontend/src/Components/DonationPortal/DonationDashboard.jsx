@@ -12,7 +12,7 @@ import {
 import { UserContext } from '../../userContext';
 import { Link } from 'react-router-dom';
 import DonationRequestModal from './DonationRequestModal';
-import axios from 'axios'; // Make sure to import axios
+import axios from 'axios';
 
 const DonationDashboard = () => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -41,7 +41,7 @@ const DonationDashboard = () => {
       setDonationRequests(Array.isArray(response.data) ? response.data : []);
       processCategories(Array.isArray(response.data) ? response.data : [])
       processMonthlyData(Array.isArray(response.data) ? response.data : [])
-
+// console.log("response here is printed as",response);
     } catch (err) {
       alert("Failed to load donations.");
     }
@@ -108,7 +108,7 @@ const DonationDashboard = () => {
       const categoryDataArray = Object.entries(categoryCounts).map(([name, value]) => ({ 
         name, 
         value,
-        // Add amount data for better visualization
+        
         amount: donations
           .filter(req => req.category === name)
           .reduce((sum, req) => sum + (req.amountRequired || 0), 0)
@@ -117,9 +117,10 @@ const DonationDashboard = () => {
       setCategoryData(categoryDataArray);
     }
   };
+  // console.log("donations are",donations);
   const processMonthlyData = (donations) => {
     if (donations.length > 0) {
-      // Create a map to store monthly data
+     
       const monthlyData = {};
       
       // Get current year
@@ -147,7 +148,7 @@ const DonationDashboard = () => {
             monthlyData[month].requests += 1;
             
             // Add donation amount if available
-            monthlyData[month].donations += request.amountDonated || 0;
+            monthlyData[month].donations += request.amountRaised || 0;
           }
         }
       });
@@ -211,7 +212,7 @@ const DonationDashboard = () => {
     if (active && payload && payload.length) {
       return (
         <Paper sx={{ p: 2 }}>
-          <Typography variant="body2">{`${label}: $${payload[0].value.toLocaleString()}`}</Typography>
+          <Typography variant="body2">{`${label}: Rs${payload[0].value.toLocaleString()}`}</Typography>
         </Paper>
       );
     }
@@ -303,7 +304,7 @@ console.log("stats are",categoryData);
                     type="monotone"
                     dataKey="donations"
                     stroke="#8884d8"
-                    name="Donations ($)"
+                    name="Donations (Rs)"
                   />
                   <Line
                     yAxisId="right"
@@ -375,7 +376,7 @@ console.log("stats are",categoryData);
                         secondary={
                           <React.Fragment>
                             <Typography component="span" variant="body2" color="text.primary">
-                               {request.category} • ${request.amount.toLocaleString()}
+                               {request.category} • Rs{request.amount.toLocaleString()}
                             </Typography>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
                               <Typography variant="body2">{formatDate(request.date)}</Typography>
@@ -442,7 +443,7 @@ console.log("stats are",categoryData);
                                   fontWeight: 'medium'
                                 }}
                               >
-                                ${donation.amount.toLocaleString()}
+                                Rs{donation.amount.toLocaleString()}
                               </Typography>
                             </Box>
                           </React.Fragment>
@@ -478,7 +479,7 @@ console.log("stats are",categoryData);
                   <Bar
                     dataKey="amount"
                     fill="lightBlue"
-                    name="Donation Amount ($)"
+                    name="Donation Amount (Rs)"
                     radius={[10, 10, 0, 0]}
                   />
                 </BarChart>

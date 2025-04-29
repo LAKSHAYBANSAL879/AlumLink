@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Drawer, IconButton, List, ListItem, ListItemText, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -9,167 +9,121 @@ import { Link } from 'react-router-dom';
 
 export const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [drawerWidth, setDrawerWidth] = useState(300); 
+
+ 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) { 
+        setDrawerWidth(260);
+      } else {
+        setDrawerWidth(300);
+      }
+    };
+
+   
+    handleResize();
+
+   
+    window.addEventListener('resize', handleResize);
+    
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
+    if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
     }
     setIsOpen(open);
   };
 
+  
+  const menuItems = [
+    { icon: faBriefcase, text: "Job Portal", link: "/jobPortal" },
+    { icon: faNewspaper, text: "Blogs", link: "/blogs" },
+    { icon: faHandHoldingDollar, text: "Donation Portal", link: "/donationPortal" },
+    { icon: faComment, text: "Connect", link: "/chatPortal" },
+    { icon: faEnvelope, text: "Contact Us", link: "/contact" }
+  ];
+
   return (
     <div>
-      
-      <IconButton onClick={toggleDrawer(true)}>
-        <MenuIcon className="text-white" />
+      <IconButton 
+        onClick={toggleDrawer(true)} 
+        aria-label="Menu"
+        className="p-1 sm:p-2"
+      >
+        <MenuIcon className="text-white h-5 w-5 sm:h-6 sm:w-6" />
       </IconButton>
 
-     
-      <Drawer anchor="left" open={isOpen} onClose={toggleDrawer(false)}>
+      <Drawer
+        anchor="left"
+        open={isOpen}
+        onClose={toggleDrawer(false)}
+        PaperProps={{
+          sx: {
+            width: drawerWidth,
+          }
+        }}
+      >
         <div
-          className="bg-gray-900 font-semibold h-full"
-          style={{
-            width: 300,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            padding: '16px',
-          }}
-          // role="presentation"
+          className="bg-gray-900 font-semibold h-full flex flex-col items-flex-start p-4"
+          role="presentation"
           onClick={toggleDrawer(false)}
           onKeyDown={toggleDrawer(false)}
         >
-          
+          {/* Close button */}
           <IconButton
             onClick={toggleDrawer(false)}
-            style={{
-              alignSelf: 'flex-end',
-              marginTop: 0,
-              color: 'white',
-            }}
+            className="self-end mt-0 text-white"
+            aria-label="Close menu"
           >
-            <CloseIcon />
+            <CloseIcon className='text-white'/>
           </IconButton>
 
-          
-          <div
-            style={{
-              alignSelf: 'center',
-              marginBottom: '16px',
-            }}
-          >
+          {/* Logo */}
+          <div className="self-center mb-4 px-2">
             <img
               src={logo}
               alt="Logo"
-              style={{
-                width: '240px',
-                height: 'auto',
-              }}
+              className="w-full max-w-[200px] sm:max-w-[240px] h-auto"
             />
           </div>
 
-          
-          <List style={{ width: '100%' }} className='pl-10'>
-            <Link to='/jobPortal'>
-            <ListItem button className="cursor-pointer" style={{ padding: '16px 0' }}>
-              <FontAwesomeIcon icon={faBriefcase} className="text-white mr-3" />
-              <ListItemText
-                primary={
-                  <Typography
-                    style={{
-                      fontSize: '20px',
-                      fontWeight: 500,
-                      color: 'white',
-                      fontFamily: 'sans-serif',
-                    }}
-                  >
-                    Job Portal
-                  </Typography>
-                }
-              />
-            </ListItem>
-            </Link>
-            
-<Link to='/blogs'>
-<ListItem button className="cursor-pointer" style={{ padding: '16px 0' }}>
-              <FontAwesomeIcon icon={faNewspaper} className="text-white mr-3" />
-              <ListItemText
-                primary={
-                  <Typography
-                    style={{
-                      fontSize: '20px',
-                      fontWeight: 500,
-                      color: 'white',
-                      fontFamily: 'sans-serif',
-                    }}
-                  >
-                   Blogs
-                  </Typography>
-                }
-              />
-            </ListItem>
-</Link>
-            
-<Link to='/donationPortal'>
-<ListItem button className="cursor-pointer" style={{ padding: '16px 0' }}>
-              <FontAwesomeIcon icon={faHandHoldingDollar} className="text-white mr-3" />
-              <ListItemText
-                primary={
-                  <Typography
-                    style={{
-                      fontSize: '20px',
-                      fontWeight: 500,
-                      color: 'white',
-                      fontFamily: 'sans-serif',
-                    }}
-                  >
-                    Donation Portal
-                  </Typography>
-                }
-              />
-            </ListItem>
-</Link>
-           
-<Link to='/chatPortal'>
-<ListItem button className="cursor-pointer" style={{ padding: '16px 0' }}>
-              <FontAwesomeIcon icon={faComment} className="text-white mr-3" />
-              <ListItemText
-                primary={
-                  <Typography
-                    style={{
-                      fontSize: '20px',
-                      fontWeight: 500,
-                      color: 'white',
-                      fontFamily: 'sans-serif',
-                    }}
-                  >
-                    Connect
-                  </Typography>
-                }
-              />
-            </ListItem>
-</Link>
-<Link to='/contact'>
-<ListItem button className="cursor-pointer" style={{ padding: '16px 0' }}>
-              <FontAwesomeIcon icon={faEnvelope} className="text-white mr-3" />
-              <ListItemText
-                primary={
-                  <Typography
-                    style={{
-                      fontSize: '20px',
-                      fontWeight: 500,
-                      color: 'white',
-                      fontFamily: 'sans-serif',
-                    }}
-                  >
-                    Contact Us
-                  </Typography>
-                }
-              />
-            </ListItem>
-</Link>
-            
+          {/* Menu Items */}
+          <List className="w-full pl-0 sm:pl-8">
+            {menuItems.map((item, index) => (
+              <Link to={item.link} key={index}>
+                <ListItem 
+                  button 
+                  className="cursor-pointer py-3 sm:py-4 px-2 hover:bg-gray-800 rounded-lg transition-colors duration-200"
+                >
+                  <FontAwesomeIcon icon={item.icon} className="text-white mr-3 w-5 h-5" />
+                  <ListItemText
+                    primary={
+                      <Typography
+                        style={{
+                          fontSize: '20px',
+                          fontWeight: 500,
+                          color: 'white',
+                          fontFamily: 'sans-serif',
+                        }}
+                        className="text-base sm:text-lg md:text-2=xl lg:text-3xl"
+                      >
+                        {item.text}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
+              </Link>
+            ))}
           </List>
+          
+          
+          <div className="mt-auto pt-4 pb-2 text-center text-white text-xs opacity-70">
+            <p>© 2025 AlumLink</p>
+          </div>
         </div>
       </Drawer>
     </div>

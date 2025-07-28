@@ -155,7 +155,8 @@ navigate(`/jobDesc/${job._id}`)
               className="flex transition-transform duration-300 ease-in-out gap-6"
               style={{ transform: `translateX(-${scrollPosition * 36.84}%)` }}
             >
-              {filteredJobs.map((job) => (
+              {filteredJobs.length>0?(
+ filteredJobs.map((job) => (
                 <div 
                   key={job._id}
                   className="w-fit bg-white p-6 rounded-xl border hover:shadow-lg transition-all relative hover:bg-gray-200 cursor-pointer"
@@ -208,7 +209,15 @@ navigate(`/jobDesc/${job._id}`)
                     </div>
                   </div>
                 </div>
-              ))}
+              ))
+              ):(
+<div className="flex flex-col justify-center items-center">
+  <h1 className="text-xl font-semibold mb-2 text-center">
+    Sorry, no jobs available at the moment.
+  </h1>
+</div>
+              )}
+             
             </div>
           </div>
         </div>

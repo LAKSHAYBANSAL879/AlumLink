@@ -35,7 +35,7 @@ navigate(`/jobDesc/${job._id}`)
 
 
   const categories = ['All', 'Design', 'Development', 'Product Management', 'Marketing'];
-  const filteredJobs = jobsData.filter(job => 
+   const filteredJobs = jobsData.filter(job => 
     (currentTab === 'All' || job.category.toLowerCase() === currentTab.toLowerCase())&& (job.location.includes(selectedLocation) || selectedLocation==='') && (job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
     job.company.toLowerCase().includes(searchTerm.toLowerCase())) &&
     job.postedBy._id !== user._id && 
@@ -216,7 +216,6 @@ navigate(`/jobDesc/${job._id}`)
     Sorry, no jobs available at the moment.
   </h1>
 </div>
-
               )}
              
             </div>

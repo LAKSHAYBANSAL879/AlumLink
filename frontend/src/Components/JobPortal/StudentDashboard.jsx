@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Card, CardContent, List, ListItem, ListItemIcon, ListItemText, Tab, Tabs, Typography,Box,Grid } from '@mui/material';
-import { LineChart, DoughnutChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, ResponsiveContainer, Bar } from 'recharts';
-import { Calendar, Mail, Award, Clock, Search, CheckCircle, XCircle, AlertCircle, Target, BarChart, TrendingUp, Bookmark, Building, MapPin } from 'lucide-react';
+import { Button, Card, CardContent, Tab, Tabs, Typography,Box } from '@mui/material';
+import { LineChart, DoughnutChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line } from 'recharts';
+import { Calendar, Mail, Award, Clock, Search, TrendingUp, Bookmark, Building, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../userContext';
 import axios from 'axios';
@@ -22,6 +22,111 @@ const StudentDashboard = () => {
      const [jobsData, setJobsData] = useState([]);
      const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
      const [selectedJob, setSelectedJob] = useState(null);
+       const [marketInsights, setMarketInsights] = useState([]);
+  const [trendsLoading, setTrendsLoading] = useState(false);
+  
+  // Default market insights as fallback
+  const defaultMarketInsights = [
+    {
+      title: 'High Demand Skills',
+      insights: ['React.js', 'TypeScript', 'AWS'],
+      trend: 'Increasing demand in enterprise companies'
+    },
+    {
+      title: 'Salary Trends',
+      insights: ['10% increase in remote positions', 'Higher rates for cloud expertise'],
+      trend: 'Average compensation up 7% from last quarter'
+    },
+    {
+      title: 'Interview Focus Areas',
+      insights: ['System Design', 'React Performance', 'AWS Services'],
+      trend: 'More emphasis on practical implementation'
+    }
+  ];
+
+  // Fetch market trends from Gemini API
+  const fetchMarketTrends = async () => {
+    const apiKey = process.env.REACT_APP_GEMINI_KEY
+    
+    if (!apiKey) {
+      console.warn('Gemini API key not found in environment variables');
+      setMarketInsights(defaultMarketInsights);
+      return;
+    }
+
+    setTrendsLoading(true);
+    
+    try {
+      const prompt = `As a career market analyst, provide 3 key insights for job seekers in the technology sector. Focus on:
+      1. High demand skills currently sought by employers mention only skills name
+      2. Salary and compensation trends
+      3. Interview focus areas and what companies are prioritizing
+
+      Format your response as a JSON array with exactly 3 objects, each containing:
+      - title: Brief category title (e.g., "High Demand Skills") only name of skills in single word
+      - insights: Array of 3 specific items/skills/trends each must not exceed 10 words
+      - trend: One sentence describing the overall trend must not exceed 40 words
+     
+
+      Example format:
+      [
+        {
+          "title": "High Demand Skills",
+          "insights": ["React.js", "TypeScript", "AWS"],
+          "trend": "Increasing demand in enterprise companies"
+        }
+      ]`;
+
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+        const content = data.candidates[0].content.parts[0].text;
+        
+        try {
+      
+          const jsonMatch = content.match(/\[[\s\S]*\]/);
+          if (jsonMatch) {
+            const parsedInsights = JSON.parse(jsonMatch[0]);
+            if (Array.isArray(parsedInsights) && parsedInsights.length >= 3) {
+              setMarketInsights(parsedInsights.slice(0, 3));
+            } else {
+              throw new Error('Invalid data format');
+            }
+          } else {
+            throw new Error('No JSON found in response');
+          }
+        } catch (parseError) {
+          console.warn('Failed to parse Gemini response:', parseError);
+          setMarketInsights(defaultMarketInsights);
+        }
+      } else {
+        throw new Error('Invalid response format');
+      }
+    } catch (err) {
+      console.error('Error fetching market trends:', err);
+      setMarketInsights(defaultMarketInsights);
+    } finally {
+      setTrendsLoading(false);
+    }
+  };
   const {user}=useContext(UserContext);
   const userId=user?._id;
 
@@ -43,7 +148,7 @@ const StudentDashboard = () => {
     fetchAppliedJobs();
   }, [userId]);
 
-  console.log("applied jobs are",appliedJobs)
+  // console.log("applied jobs are",appliedJobs)
   const generateApplicationTrends = () => {
     let trends = {};
   
@@ -107,7 +212,7 @@ const StudentDashboard = () => {
     const fetchJobs = async () => {
       try {
         const response = await axios.get('https://alumlink-ruo3.onrender.com/api/v1/jobs/all'); 
-        setJobsData(response.data.slice(0,5));
+        setJobsData(response.data);
        
       } catch (error) {
         console.error('Error fetching job data:', error);
@@ -116,25 +221,6 @@ const StudentDashboard = () => {
 
     fetchJobs();
   }, []);
-
-  const marketInsights = [
-    {
-      title: 'High Demand Skills',
-      insights: ['React.js', 'TypeScript', 'AWS'],
-      trend: 'Increasing demand in enterprise companies'
-    },
-    {
-      title: 'Salary Trends',
-      insights: ['10% increase in remote positions', 'Higher rates for cloud expertise'],
-      trend: 'Average compensation up 7% from last quarter'
-    },
-    {
-      title: 'Interview Focus Areas',
-      insights: ['System Design', 'React Performance', 'AWS Services'],
-      trend: 'More emphasis on practical implementation'
-    }
-  ];
-
 
   const TabPanel = (props) => {
     const { children, value, index, ...other } = props;
@@ -203,9 +289,10 @@ const StudentDashboard = () => {
       countApplicationStatuses();
       generateUpcomingInterviews();
       generateApplicationTrends();
+      fetchMarketTrends();
      
     }, [appliedJobs]);
-  console.log("applied jobs are",appliedJobs)
+  // console.log("applied jobs are",appliedJobs)
 
   // useEffect(() => {
   //   console.log('Updated savedJobs:', savedJobs);
@@ -226,6 +313,12 @@ navigate(`/jobDesc/${job._id}`)
       year: 'numeric',
     });
   };
+  const currentDate=new Date();
+   const filteredJobs = jobsData.filter(job => 
+    job.postedBy._id !== user._id && 
+    (!job.applicationDeadline || new Date(job.applicationDeadline) >= currentDate)); // Exclude expired)
+    filteredJobs.slice(0,5);
+    
   return (
     <div className="p-6 space-y-6  min-h-screen">
       {/* Header */}
@@ -316,28 +409,35 @@ navigate(`/jobDesc/${job._id}`)
           </Tabs>
         </Box>
 
-        <TabPanel value={tabValue} index={0}>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {marketInsights.map((insight, index) => (
-              <Card key={index} className="p-4 border">
-                <h3 className="font-semibold text-lg mb-3">{insight.title}</h3>
-                <ul className="space-y-2">
-                  {insight.insights.map((item, i) => (
-                    <li key={i} className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-green-500" />
-                      <span>{item}</span>
-                    </li>
+             <TabPanel value={tabValue} index={0}>
+              {trendsLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+                  <span>Fetching latest market trends...</span>
+                </div>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {marketInsights.map((insight, index) => (
+                    <Card key={index} className="p-4 border">
+                      <h3 className="font-semibold text-lg mb-3">{insight.title}</h3>
+                      <ul className="space-y-2">
+                        {insight.insights.map((item, i) => (
+                          <li key={i} className="flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-green-500" />
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="mt-3 text-sm text-gray-600">{insight.trend}</p>
+                    </Card>
                   ))}
-                </ul>
-                <p className="mt-3 text-sm text-gray-600">{insight.trend}</p>
-              </Card>
-            ))}
-          </div>
-        </TabPanel>
+                </div>
+              )}
+            </TabPanel>
 
         <TabPanel value={tabValue} index={1}>
       <div className="space-y-4">
-        {jobsData.map((job) => (
+        {filteredJobs.map((job) => (
           <Card key={job?._id} className="p-5 border hover:shadow-md transition-shadow duration-200">
             <div className="flex justify-between items-start align-left text-left">
               <div className="space-y-2">

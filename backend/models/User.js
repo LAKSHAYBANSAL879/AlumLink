@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt'); //stroing password important credentials in hashed manner
 const salt=require('salt')
 
 

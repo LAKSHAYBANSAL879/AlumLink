@@ -15,9 +15,11 @@ const JobDescription = () => {
   const [hasApplied, setHasApplied] = useState(false);
   const [allJobs, setAllJobs] = useState([]);
   const [similarJobs, setSimilarJobs] = useState([]);
+  const [limit,setLimit]=useState(false);
 
   const { user } = useContext(UserContext);
   const userId=user?._id;
+  const currDate=new Date();
 
   useEffect(() => {
     const fetchJobDetails = async () => {
@@ -147,7 +149,13 @@ navigate(`/jobDesc/${job?._id}`)
     };
   
     checkUserApplication();
+    checkExpired();
   }, [jobId, userId]);
+  const checkExpired=()=>{
+    if(new Date(job.applicationDeadline)>=currDate){
+      setLimit(true);
+    }
+  }
   return (
     <div className="w-5/6 mx-auto p-6 bg-white rounded-md flex gap-4">
       <div className="flex flex-col w-2/3 shadow-lg p-4 align-middle justify-start">
@@ -192,10 +200,10 @@ navigate(`/jobDesc/${job?._id}`)
               <div className="flex gap-3 mr-8">
               <button
   onClick={handleApply}
-  disabled={hasApplied}
+  disabled={hasApplied || limit}
   className={` rounded-2xl px-10 py-1 ${hasApplied ? 'bg-gray-400 cursor-not-allowed text-white font-normal text-base' : 'bg-green-500 hover:bg-green-400 text-white'}`}
 >
-  {hasApplied ? 'Applied' : 'Apply'}
+  {hasApplied ? 'Alread Applied or Job Expired' : 'Apply'}
 </button>
               </div>
             </div>

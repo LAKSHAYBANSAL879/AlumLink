@@ -85,7 +85,7 @@ const fetchDonations = async () => {
       checkExpiredDonations();
     }
 
-    const intervalId = setInterval(checkExpiredDonations, 3600000); // 1 hour
+    const intervalId = setInterval(checkExpiredDonations, 3600000); 
 
     return () => clearInterval(intervalId);
   }, [donationRequests]);

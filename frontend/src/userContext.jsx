@@ -13,7 +13,7 @@ const [role,setRole]=useState(null);
     const fetchUserDetails = async () => {
       try {
         const token = Cookies.get('token');
-console.log(token);
+// console.log(token);
         if (token) {
           const response = await axios.get('https://alumlink-ruo3.onrender.com/api/v1/auth/getuser', {
             headers: {

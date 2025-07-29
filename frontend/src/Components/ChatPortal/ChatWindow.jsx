@@ -1,11 +1,17 @@
-import React, { useContext, useState, useRef, useEffect } from 'react';
+import React, { useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { 
   Box, Typography, TextField, Avatar, Badge, IconButton, 
   Tooltip, Button, Popover, InputAdornment
 } from '@mui/material';
 import { 
   ChevronLeft, Phone, Video, Info, Smile, Paperclip, 
-  Send, Mic, X, FileText, Image, Music
+  Send, Mic, X, FileText, Image, Music,
+  VideoIcon,
+  MicIcon,
+  BusIcon,
+  MicOffIcon,
+  VideoOffIcon,
+  PhoneCallIcon
 } from 'lucide-react';
 import { ChatContext } from './ChatContext';
 import EmojiPicker from 'emoji-picker-react';
@@ -188,8 +194,10 @@ const ChatWindow = () => {
     messagesEndRef,
     typingUsers,
     attachments,
-    setAttachments
+    setAttachments,
+    callStatus
   } = useContext(ChatContext);
+
 
   // State for emoji picker
   const [emojiAnchorEl, setEmojiAnchorEl] = useState(null);
@@ -277,28 +285,6 @@ const ChatWindow = () => {
     setAttachments(prev => prev.filter(att => att.id !== id));
   };
 
-  // Prepare message with attachments
-  const prepareAndSendMessage = () => {
-    // Update the message object to include attachments
-    if (message.trim() || attachments.length > 0) {
-      // Create a new message object with attachments
-      const messageWithAttachments = {
-        text: message,
-        mediaUrls: attachments
-      };
-      
-      // Set the message in context
-      setMessage(messageWithAttachments);
-      
-      // Call the handleSendMessage from context
-      handleSendMessage();
-      
-      // Reset local state
-      setMessage('');
-      setAttachments([]);
-    }
-  };
-
   // Go back to contacts list on mobile
   const handleGoBack = () => {
     setSelectedChat(null);
@@ -370,11 +356,14 @@ const ChatWindow = () => {
                   <Phone size={20} />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Video call">
-                <IconButton>
-                  <Video size={20} />
-                </IconButton>
-              </Tooltip>
+              {callStatus === 'idle' && (
+          <button 
+            className="p-2 rounded-full bg-blue-50 text-blue-500 hover:bg-blue-100"
+            aria-label="Start video call"
+          >
+            <PhoneCallIcon size={20} />
+          </button>
+        )}
               <Tooltip title="Chat info">
                 <IconButton>
                   <Info size={20} />
@@ -691,6 +680,7 @@ const ChatWindow = () => {
           </Typography>
         </Box>
       )}
+      {/* <VideoCallInterface receiverId={selectedChat?._id} /> */}
     </Box>
   );
 };

@@ -13,7 +13,7 @@ const jobSchema = new mongoose.Schema({
   postedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   applicants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // List of users who applied
   skillsRequired: [{ type: String ,required:true}],
-  experienceLevel: { type: String, enum: ["Fresher", "1-3 years", "3+ years"], required: true },
+  experienceLevel: { type: String, enum: ["Fresher", "0-3 years", "3+ years"], required: true },
   applicationDeadline: { type: Date },
   maxApplicants:{type:Number},
   createdAt: { type: Date, default: Date.now }

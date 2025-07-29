@@ -80,7 +80,21 @@ function initializeSocket(io) {
     socket.on('authenticate', async (token) => {
       try {
         
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || process.env.SECRET);
+      //  const token = socket.handshake.auth.token;
+
+if (!token || typeof token !== 'string') {
+  console.error("Invalid or missing token:", token);
+  return socket.disconnect(true); 
+}
+let decoded;
+try {
+decoded = jwt.verify(token, process.env.JWT_SECRET || process.env.SECRET);
+  socket.user = decoded; 
+} catch (err) {
+  console.error("JWT verification failed:", err.message);
+  return socket.disconnect(true); 
+}
+
         const userId = decoded.id || decoded.userId; 
         if (userId) {
           // Store socket information

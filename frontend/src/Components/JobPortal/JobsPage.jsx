@@ -19,7 +19,7 @@ export default function JobsPage() {
     const fetchJobs = async () => {
       try {
         const response = await axios.get('https://alumlink-ruo3.onrender.com/api/v1/jobs/all'); 
-        console.log("job data is",response.data);
+        // console.log("job data is",response.data);
         setJobsData(response.data);
       } catch (error) {
         console.error('Error fetching job data:', error);
@@ -39,7 +39,7 @@ navigate(`/jobDesc/${job._id}`)
     (currentTab === 'All' || job.category.toLowerCase() === currentTab.toLowerCase())&& (job.location.includes(selectedLocation) || selectedLocation==='') && (job.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
     job.company.toLowerCase().includes(searchTerm.toLowerCase())) &&
     job.postedBy._id !== user._id && 
-    (!job.appliedDate || new Date(job.appliedDate) >= currentDate)); // Exclude expired);
+    (!job.applicationDeadline || new Date(job.applicationDeadline) >= currentDate)); // Exclude expired);
 
     const handleScroll = (direction) => {
       const cardWidth = 36.84 + 6;
@@ -155,7 +155,8 @@ navigate(`/jobDesc/${job._id}`)
               className="flex transition-transform duration-300 ease-in-out gap-6"
               style={{ transform: `translateX(-${scrollPosition * 36.84}%)` }}
             >
-              {filteredJobs.map((job) => (
+              {filteredJobs.length>0?(
+ filteredJobs.map((job) => (
                 <div 
                   key={job._id}
                   className="w-fit bg-white p-6 rounded-xl border hover:shadow-lg transition-all relative hover:bg-gray-200 cursor-pointer"
@@ -208,7 +209,16 @@ navigate(`/jobDesc/${job._id}`)
                     </div>
                   </div>
                 </div>
-              ))}
+              ))
+              ):(
+<div className="flex flex-col justify-center items-center">
+  <h1 className="text-xl font-semibold mb-2 text-center">
+    Sorry, no jobs available at the moment.
+  </h1>
+</div>
+
+              )}
+             
             </div>
           </div>
         </div>

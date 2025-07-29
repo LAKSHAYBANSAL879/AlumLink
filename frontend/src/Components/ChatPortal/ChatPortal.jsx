@@ -14,4 +14,4 @@ const ChatPortal = () => {
   )
 }
 
-export default ChatPortal
+export default ChatPortal;

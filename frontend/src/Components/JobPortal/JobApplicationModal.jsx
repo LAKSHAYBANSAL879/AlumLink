@@ -65,7 +65,7 @@ const JobApplicationModal = ({ isOpen, onClose, jobData, userData }) => {
     if (name === "resume") setResumeError(true);
     if (name === "coverLetter") setCoverLetterError(true);
   };
-console.log(jobData?._id,userData?._id);
+// console.log(jobData?._id,userData?._id);
   const handleSubmit = async (e) => {
     e.preventDefault();
 

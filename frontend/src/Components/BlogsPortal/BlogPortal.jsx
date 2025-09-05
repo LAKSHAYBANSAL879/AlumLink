@@ -37,7 +37,7 @@ const BlogPortal = () => {
 
   const fetchBlogs = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/v1/blogs/allBlogs');
+      const response = await axios.get('https://alumlink-ruo3.onrender.com/api/v1/blogs/allBlogs');
     
       const processedBlogs = response.data.map(blog => ({
         ...blog,
@@ -72,7 +72,7 @@ const BlogPortal = () => {
     try {
       if (!user?._id) return [];
   
-      const response = await axios.get(`http://localhost:8080/api/v1/blogs/getLikedBlogs/${userId}`);
+      const response = await axios.get(`https://alumlink-ruo3.onrender.com/api/v1/blogs/getLikedBlogs/${userId}`);
       
      
       const processedLikedBlogs = response.data.map(blog => ({
@@ -224,7 +224,7 @@ const BlogPortal = () => {
   
     try {
       const response = await axios.post(
-        `http://localhost:8080/api/v1/blogs/${isLiked ? 'removeLike' : 'addLike'}`,
+        `https://alumlink-ruo3.onrender.com/api/v1/blogs/${isLiked ? 'removeLike' : 'addLike'}`,
         { blogId, userId: user._id }
       );
   
@@ -266,8 +266,8 @@ const BlogPortal = () => {
     try {
       const isSaved = blogInteractions[blogId]?.saved;
       const url = isSaved 
-        ? 'http://localhost:8080/api/v1/auth/unsaveBlog'
-        : 'http://localhost:8080/api/v1/auth/saveBlog';
+        ? 'https://alumlink-ruo3.onrender.com/api/v1/auth/unsaveBlog'
+        : 'https://alumlink-ruo3.onrender.com/api/v1/auth/saveBlog';
 
       await axios.post(url, { 
         blogId, 
@@ -306,7 +306,7 @@ const BlogPortal = () => {
     if (coverPhoto.startsWith('http://') || coverPhoto.startsWith('https://')) {
       return coverPhoto;
     }
-    return `http://localhost:8080/api/v1/blogs/uploadss/${coverPhoto}`;
+    return `https://alumlink-ruo3.onrender.com/api/v1/blogs/uploadss/${coverPhoto}`;
   };
 
   return (

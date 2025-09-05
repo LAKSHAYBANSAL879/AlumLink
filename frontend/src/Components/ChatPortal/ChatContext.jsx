@@ -25,7 +25,7 @@ export const ChatProvider = ({ children }) => {
   useEffect(() => {
     if (user?._id) {
       const token = Cookies.get('token');
-      const newSocket = io('http://localhost:8080', {
+      const newSocket = io('https://alumlink-ruo3.onrender.com', {
         auth: { token },
         reconnection: true,
         reconnectionAttempts: 5,
@@ -56,7 +56,7 @@ export const ChatProvider = ({ children }) => {
   const updateUnreadCount = useCallback(async (userId, count) => {
     try {
      
-      await axios.put(`http://localhost:8080/api/v1/messages/${userId}/unread`, 
+      await axios.put(`https://alumlink-ruo3.onrender.com/api/v1/messages/${userId}/unread`, 
         { 
           unreadCount: count,
           currentUserId: user._id
@@ -82,7 +82,7 @@ export const ChatProvider = ({ children }) => {
 
   const fetchContacts = useCallback(async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/messages/contacts/${user._id}`);
+      const response = await axios.get(`https://alumlink-ruo3.onrender.com/api/v1/messages/contacts/${user._id}`);
       
       // Store the contacts with empty messages arrays
       const contactsWithEmptyMessages = response.data.map(contact => ({
@@ -102,7 +102,7 @@ export const ChatProvider = ({ children }) => {
   const fetchMessages = useCallback(async (userId) => {
     if(!userId || !user._id) return;
     try {
-      const response = await axios.get(`http://localhost:8080/api/v1/messages/messages/${user._id}/${userId}`);
+      const response = await axios.get(`https://alumlink-ruo3.onrender.com/api/v1/messages/messages/${user._id}/${userId}`);
       
       // Format messages for UI display
       const formattedMessages = response.data.messages.map(msg => ({
@@ -286,7 +286,7 @@ export const ChatProvider = ({ children }) => {
   const fetchUsers = async () => {
     try {
       const token = Cookies.get('token');
-      const response = await axios.get('http://localhost:8080/api/v1/auth/allUsers', {
+      const response = await axios.get('https://alumlink-ruo3.onrender.com/api/v1/auth/allUsers', {
         headers: {
           Authorization: `${token}`,
         }
@@ -473,7 +473,7 @@ filesToSend.forEach((att, index) => {
 
   
         const response = await axios.post(
-          'http://localhost:8080/api/v1/messages/message',
+          'https://alumlink-ruo3.onrender.com/api/v1/messages/message',
           formData,
           {
             headers: {
@@ -562,7 +562,7 @@ filesToSend.forEach((att, index) => {
     // Create chat in backend
     try {
       // const token = Cookies.get('token');
-      await axios.post('http://localhost:8080/api/v1/messages/chats', 
+      await axios.post('https://alumlink-ruo3.onrender.com/api/v1/messages/chats', 
         { 
           userId: user._id,
           currentUserId: user._id

@@ -157,7 +157,7 @@ const AddBlogModal = ({ isOpen, onClose, loggedInUser }) => {
     
    try{
     const response = await axios.post(
-      "http://localhost:8080/api/v1/blogs/create",
+      "https://alumlink-ruo3.onrender.com/api/v1/blogs/create",
       blogData,
       {
         headers: { "Content-Type": "multipart/form-data" },

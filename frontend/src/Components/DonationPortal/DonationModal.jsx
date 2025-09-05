@@ -47,7 +47,7 @@ const DonationForm = ({ onClose, donationRequestId, donorId, onSuccess }) => {
 
     try {
       // Step 1: Create payment intent using your backend API
-      const createPaymentResponse = await axios.post('http://localhost:8080/api/v1/donations/donate', {
+      const createPaymentResponse = await axios.post('https://alumlink-ruo3.onrender.com/api/v1/donations/donate', {
         amount: amountNum,
         donationRequestId,
         donorId,
@@ -74,7 +74,7 @@ const DonationForm = ({ onClose, donationRequestId, donorId, onSuccess }) => {
       }
 
       if (paymentIntent.status === 'succeeded') {
-        await axios.post('http://localhost:8080/api/v1/donations/confirmDonation', {
+        await axios.post('https://alumlink-ruo3.onrender.com/api/v1/donations/confirmDonation', {
           donationRequestId,
           donorId,
           amount: amountNum,

@@ -17,7 +17,7 @@ const CodeBlockHighlighter = ({ blogId }) => {
 
   // Fetch content from the backend
   useEffect(() => {
-    axios.get(`http://localhost:8080/api/v1/blogs/${blogId}`)
+    axios.get(`https://alumlink-ruo3.onrender.com/api/v1/blogs/${blogId}`)
       .then(response => {
         setContent(response.data.content);
       })
@@ -70,7 +70,7 @@ const CodeBlockHighlighter = ({ blogId }) => {
       const updatedContent = processCodeBlocks();
       if (!updatedContent) return; // 🔥 Prevents sending empty content
 
-      axios.put(`http://localhost:8080/api/v1/blogs/update/${blogId}`, { content: updatedContent })
+      axios.put(`https://alumlink-ruo3.onrender.com/api/v1/blogs/update/${blogId}`, { content: updatedContent })
         .then(() => console.log('Updated content saved to backend'))
         .catch(err => console.error('Error updating backend:', err));
     }, 200);

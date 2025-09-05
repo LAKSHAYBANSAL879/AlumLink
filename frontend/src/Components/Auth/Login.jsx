@@ -28,7 +28,7 @@ export default function Example() {
       console.log("User Details:", { name, email, picture });
       try {
         // Send user data to the backend to check if they exist
-        const response = await axios.post('http://localhost:8080/api/v1/auth/googleLogin', {
+        const response = await axios.post('https://alumlink-ruo3.onrender.com/api/v1/auth/googleLogin', {
             email
         });
 
@@ -58,7 +58,7 @@ export default function Example() {
 
   try {
     
-   const response= await axios.post('http://localhost:8080/api/v1/auth/signin', {
+   const response= await axios.post('https://alumlink-ruo3.onrender.com/api/v1/auth/signin', {
            
       email,
       password,
@@ -91,7 +91,7 @@ export default function Example() {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form action="http://localhost:8080/api/v1/auth/signin" onSubmit={loginUser} method="POST" className="space-y-6">
+          <form action="https://alumlink-ruo3.onrender.com/api/v1/auth/signin" onSubmit={loginUser} method="POST" className="space-y-6">
             <div>
               <label
                 htmlFor="email"

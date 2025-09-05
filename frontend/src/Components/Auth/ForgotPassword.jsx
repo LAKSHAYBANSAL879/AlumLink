@@ -14,7 +14,7 @@ const ForgotPassword = () => {
     const handleEmailSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/api/v1/auth/forgot-password', { email });
+            const response = await axios.post('https://alumlink-ruo3.onrender.com/api/v1/auth/forgot-password', { email });
             setMessage(response.data.message);
             setStep(2);
         } catch (error) {
@@ -25,7 +25,7 @@ const ForgotPassword = () => {
     const handleResetPassword = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:8080/api/v1/auth/reset-password', { otp, password: newPassword });
+            const response = await axios.post('https://alumlink-ruo3.onrender.com/api/v1/auth/reset-password', { otp, password: newPassword });
             setMessage(response.data.message);
             navigate('/login');
         } catch (error) {

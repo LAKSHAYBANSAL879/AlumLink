@@ -47,7 +47,7 @@ const ProfilePage = () => {
   const handleLogout = async () => {
     try {
       const userId=user._id
-      await axios.post(`http://localhost:8080/api/v1/auth/logout/${userId}`);
+      await axios.post(`https://alumlink-ruo3.onrender.com/api/v1/auth/logout/${userId}`);
   
       setUser(null);
       Cookies.remove("token");
@@ -72,7 +72,7 @@ const ProfilePage = () => {
       }
 
       const response = await axios.put(
-        "http://localhost:8080/api/v1/auth/update",
+        "https://alumlink-ruo3.onrender.com/api/v1/auth/update",
         formData,
         {
           headers: {
@@ -94,7 +94,7 @@ const ProfilePage = () => {
     if (coverPhoto.startsWith('http://') || coverPhoto.startsWith('https://')) {
       return coverPhoto;
     }
-    return `http://localhost:8080/api/v1/auth/uploadss/${coverPhoto}`;
+    return `https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${coverPhoto}`;
   };
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">

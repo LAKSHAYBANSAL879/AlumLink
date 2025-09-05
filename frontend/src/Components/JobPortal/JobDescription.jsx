@@ -24,7 +24,7 @@ const JobDescription = () => {
   useEffect(() => {
     const fetchJobDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/jobs/${jobId}`);
+        const response = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/jobs/${jobId}`);
         if (!response.ok) throw new Error('Failed to fetch job details');
         const data = await response.json();
         setJob(data);
@@ -36,7 +36,7 @@ const JobDescription = () => {
     const checkIfJobSaved = async () => {
       if (!userId) return;
       try {
-        const response = await fetch('http://localhost:8080/api/v1/auth/getSavedJobs', {
+        const response = await fetch('https://alumlink-ruo3.onrender.com/api/v1/auth/getSavedJobs', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId }),
@@ -50,7 +50,7 @@ const JobDescription = () => {
     };
     const fetchAllJobs = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/v1/jobs/all'); // Fetch all jobs
+        const response = await fetch('https://alumlink-ruo3.onrender.com/api/v1/jobs/all'); // Fetch all jobs
         if (!response.ok) throw new Error('Failed to fetch jobs');
         const data = await response.json();
         setAllJobs(data);
@@ -84,8 +84,8 @@ const handleCheckScore = () => {
     if (!user) return alert('Please log in to save jobs');
 
     const url = isBookmarked 
-      ? 'http://localhost:8080/api/v1/auth/unsaveJob' 
-      : 'http://localhost:8080/api/v1/auth/saveJob';
+      ? 'https://alumlink-ruo3.onrender.com/api/v1/auth/unsaveJob' 
+      : 'https://alumlink-ruo3.onrender.com/api/v1/auth/saveJob';
 
     try {
       const response = await fetch(url, {
@@ -134,7 +134,7 @@ navigate(`/jobDesc/${job?._id}`)
       if (!userId) return;
   
       try {
-        const response = await fetch('http://localhost:8080/api/v1/jobs/checkUserApplied', {
+        const response = await fetch('https://alumlink-ruo3.onrender.com/api/v1/jobs/checkUserApplied', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ jobId, userId }),

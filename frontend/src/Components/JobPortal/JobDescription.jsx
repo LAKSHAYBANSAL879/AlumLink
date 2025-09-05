@@ -24,7 +24,7 @@ const JobDescription = () => {
   useEffect(() => {
     const fetchJobDetails = async () => {
       try {
-        const response = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/jobs/${jobId}`);
+        const response = await fetch(`http://localhost:8080/api/v1/jobs/${jobId}`);
         if (!response.ok) throw new Error('Failed to fetch job details');
         const data = await response.json();
         setJob(data);
@@ -36,7 +36,7 @@ const JobDescription = () => {
     const checkIfJobSaved = async () => {
       if (!userId) return;
       try {
-        const response = await fetch('https://alumlink-ruo3.onrender.com/api/v1/auth/getSavedJobs', {
+        const response = await fetch('http://localhost:8080/api/v1/auth/getSavedJobs', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId }),
@@ -50,7 +50,7 @@ const JobDescription = () => {
     };
     const fetchAllJobs = async () => {
       try {
-        const response = await fetch('https://alumlink-ruo3.onrender.com/api/v1/jobs/all'); // Fetch all jobs
+        const response = await fetch('http://localhost:8080/api/v1/jobs/all'); // Fetch all jobs
         if (!response.ok) throw new Error('Failed to fetch jobs');
         const data = await response.json();
         setAllJobs(data);
@@ -84,8 +84,8 @@ const handleCheckScore = () => {
     if (!user) return alert('Please log in to save jobs');
 
     const url = isBookmarked 
-      ? 'https://alumlink-ruo3.onrender.com/api/v1/auth/unsaveJob' 
-      : 'https://alumlink-ruo3.onrender.com/api/v1/auth/saveJob';
+      ? 'http://localhost:8080/api/v1/auth/unsaveJob' 
+      : 'http://localhost:8080/api/v1/auth/saveJob';
 
     try {
       const response = await fetch(url, {
@@ -134,7 +134,7 @@ navigate(`/jobDesc/${job?._id}`)
       if (!userId) return;
   
       try {
-        const response = await fetch('https://alumlink-ruo3.onrender.com/api/v1/jobs/checkUserApplied', {
+        const response = await fetch('http://localhost:8080/api/v1/jobs/checkUserApplied', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ jobId, userId }),
@@ -157,8 +157,8 @@ navigate(`/jobDesc/${job?._id}`)
     }
   }
   return (
-    <div className="w-5/6 mx-auto p-6 bg-white rounded-md flex gap-4">
-      <div className="flex flex-col w-2/3 shadow-lg p-4 align-middle justify-start">
+    <div className="w-full md:w-5/6 mx-auto p-6 bg-white rounded-md flex md:flex-row flex-col gap-4">
+      <div className="flex flex-col w-full md:w-2/3 shadow-lg p-4 align-middle justify-start">
         <div className="flex flex-row justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">{job?.title}</h1>
           <button
@@ -168,47 +168,67 @@ navigate(`/jobDesc/${job?._id}`)
             <BookmarkPlus className="w-6 h-6" />
           </button>
         </div>
-        <div className="flex flex-row justify-start align-middle text-left gap-4">
-          <div>
-            <img src={job?.companyImageUrl} alt="" className="w-24 h-24" />
-          </div>
-          <div className="flex flex-col text-left align-middle justify-start gap-2 w-full">
-            <div className="flex gap-4">
-              <h1 className="text-gray-600 font-medium text-lg font-mono">{job?.company}</h1>
-              <h1 className="flex gap-1 align-middle items-center text-gray-600">
-                <Clock className="w-5 h-5" />{timeAgo(job?.createdAt)}
-              </h1>
-              <h1 className='flex items-center align-middle gap-2 text-gray-600'>
-                <span className='font-medium'>Apply by </span> {formatDate(job?.applicationDeadline)}
-              </h1>
-            </div>
-            <div className="flex gap-4 flex-row">
-              <h1 className="text-gray-600 py-1 rounded-full text-base flex align-middle gap-1 items-center">
-                <BriefcaseBusiness className="text-base h-6 w-6" />
-                <span className="font-normal text-base">{job?.experienceLevel}</span>
-              </h1>
-              <h1 className="text-gray-600 px-3 py-1 rounded-full text-base flex flex-row align-middle gap-1 items-center">
-                <ReceiptIndianRupee className="text-base h-6 w-6" />
-                <span>{job?.salaryRange}</span>
-              </h1>
-            </div>
-            <div className="flex justify-between w-full">
-              <h1 className="text-gray-600 py-1 rounded-full text-base flex align-middle gap-1 items-center">
-                <MapPin className="text-base h-6 w-6" />
-                <span className="font-normal text-base">{job?.location?.join(', ')}</span>
-              </h1>
-              <div className="flex gap-3 mr-8">
-              <button
-  onClick={handleApply}
-  disabled={hasApplied || limit}
-  className={` rounded-2xl px-10 py-1 ${hasApplied ? 'bg-gray-400 cursor-not-allowed text-white font-normal text-base' : 'bg-green-500 hover:bg-green-400 text-white'}`}
->
-  {hasApplied ? 'Alread Applied or Job Expired' : 'Apply'}
-</button>
-              </div>
-            </div>
-          </div>
-        </div>
+  <div className="flex flex-col md:flex-row justify-center items-center md:justify-start md:items-start gap-4 p-4 border rounded-xl shadow-sm">
+  {/* Company Logo */}
+  <div className="flex-shrink-0">
+    <img
+      src={job?.companyImageUrl}
+      alt={`${job?.company} logo`}
+      className="w-24 h-24 text-center md:text-left md:w-24 md:h-24 object-contain rounded"
+    />
+  </div>
+
+  {/* Job Info */}
+  <div className="flex flex-col gap-3 w-full">
+    {/* Company + Posted Time + Deadline */}
+    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-6">
+      <h1 className="text-gray-700 font-semibold text-lg font-mono">
+        {job?.company}
+      </h1>
+      <h1 className="flex items-center gap-1 text-gray-600 text-sm">
+        <Clock className="w-4 h-4" />
+        {timeAgo(job?.createdAt)}
+      </h1>
+      <h1 className="flex items-center gap-2 text-gray-600 text-sm">
+        <span className="font-medium">Apply by</span>{" "}
+        {formatDate(job?.applicationDeadline)}
+      </h1>
+    </div>
+
+    {/* Experience + Salary */}
+    <div className="flex flex-col md:flex-row gap-3">
+      <h1 className="flex items-center gap-2 text-gray-600 text-sm">
+        <BriefcaseBusiness className="w-5 h-5" />
+        <span>{job?.experienceLevel}</span>
+      </h1>
+      <h1 className="flex items-center gap-2 text-gray-600 text-sm">
+        <ReceiptIndianRupee className="w-5 h-5" />
+        <span>{job?.salaryRange}</span>
+      </h1>
+    </div>
+
+    {/* Location + Apply Button */}
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 w-full">
+      <h1 className="flex items-center gap-2 text-gray-600 text-sm">
+        <MapPin className="w-5 h-5" />
+        <span>{job?.location?.join(", ")}</span>
+      </h1>
+
+      <button
+        onClick={handleApply}
+        disabled={hasApplied || limit}
+        className={`px-6 py-2 rounded-2xl text-sm font-medium transition ${
+          hasApplied || limit
+            ? "bg-gray-400 cursor-not-allowed text-white"
+            : "bg-green-500 hover:bg-green-400 text-white"
+        } w-full sm:w-auto`}
+      >
+        {hasApplied ? "Already Applied or Job Expired" : "Apply"}
+      </button>
+    </div>
+  </div>
+</div>
+
 
         <div className="w-full mx-auto mt-3 mb-2 roundex-3xl border-b-2 border-gray-500 border-dashed pb-4">
           <h1 className="py-1 w-3/4 mx-auto text-gray-600 font-normal bg-blue-200 rounded-2xl">
@@ -255,7 +275,7 @@ navigate(`/jobDesc/${job?._id}`)
         </div>
       </div>
 
-      <div className="w-1/3 space-y-6">
+      <div className="w-full md:w-1/3 space-y-6">
       <h2 className="text-2xl font-bold text-gray-900">Similar Jobs</h2>
       <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
         {similarJobs.length>0 ? (

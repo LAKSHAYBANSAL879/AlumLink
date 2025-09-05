@@ -34,6 +34,5 @@ const notificationSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-// Create compound index for faster queries
 
 module.exports = mongoose.model('Notification', notificationSchema);

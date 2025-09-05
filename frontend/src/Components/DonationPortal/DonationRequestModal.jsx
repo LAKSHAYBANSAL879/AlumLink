@@ -71,7 +71,7 @@ const DonationRequestModal = ({ open, onClose,userData }) => {
       formData.append("createdBy", userData._id);
     }
     try {
-      const response = await axios.post("https://alumlink-ruo3.onrender.com/api/v1/donations/newDonation", formData);
+      const response = await axios.post("http://localhost:8080/api/v1/donations/newDonation", formData);
       console.log("Success:", response.data);
       toast.success("new donation request added sucessfully")
       // onSubmit(response.data);

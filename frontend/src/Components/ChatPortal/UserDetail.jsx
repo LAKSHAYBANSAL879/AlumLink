@@ -50,7 +50,7 @@ const UserDetail = () => {
         >
           <Avatar 
             alt={selectedChat.name} 
-            src={`https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${selectedChat?.profileImageUrl}`}
+            src={`http://localhost:8080/api/v1/auth/uploadss/${selectedChat?.profileImageUrl}`}
             sx={{ width: 80, height: 80 }}
           />
         </Badge>

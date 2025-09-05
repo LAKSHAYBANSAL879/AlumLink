@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Search, ChevronLeft, ChevronRight, Sparkle, ArrowRight, BookmarkPlus, MapPin, ReceiptIndianRupee } from 'lucide-react';
-import { Tabs, Tab } from '@mui/material';
+import { Tabs, Tab, useMediaQuery, useTheme } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { UserContext } from '../../userContext';
@@ -14,11 +14,13 @@ export default function JobsPage() {
   const [jobsData, setJobsData] = useState([]);
   const {user}=useContext(UserContext);
   const currentDate = new Date();
+    const theme = useTheme();
+    const isMdDown = useMediaQuery(theme.breakpoints.down("md"));
   
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get('https://alumlink-ruo3.onrender.com/api/v1/jobs/all'); 
+        const response = await axios.get('http://localhost:8080/api/v1/jobs/all'); 
         // console.log("job data is",response.data);
         setJobsData(response.data);
       } catch (error) {
@@ -100,11 +102,12 @@ navigate(`/jobDesc/${job._id}`)
         </div>
       </div>
 
-      <div className="flex gap-8">
+      <div className="flex flex-col md:flex-row gap-8">
         <div className="w-64">
           <Tabs
-            orientation="vertical"
+            orientation={isMdDown?"horizontal":"vertical"}
             value={currentTab}
+            variant={isMdDown ? "scrollable" : "standard"} 
             onChange={(_, newValue) => handleTabChange(newValue)}
             className="bg-white rounded-xl p-4"
             TabIndicatorProps={{

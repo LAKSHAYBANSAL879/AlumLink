@@ -29,7 +29,7 @@ function Navbar() {
         if (!user || !user._id) return;
         
         // Setup socket connection
-        const socket = io(process.env.REACT_APP_API_URL || 'https://alumlink-ruo3.onrender.com');
+        const socket = io(process.env.REACT_APP_API_URL || 'http://localhost:8080');
         
         // Authenticate with socket
         socket.emit('authenticate', user._id);
@@ -76,7 +76,7 @@ function Navbar() {
     const fetchNotifications = async () => {
         const userId = user?._id;
         try {
-            const response = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/notification/${userId}?limit=7`, {
+            const response = await fetch(`http://localhost:8080/api/v1/notification/${userId}?limit=7`, {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
@@ -95,7 +95,7 @@ function Navbar() {
     
     const markAsRead = async (id) => {
         try {
-            const response = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/notification/${id}/read`, {
+            const response = await fetch(`http://localhost:8080/api/v1/notification/${id}/read`, {
                 method: 'PUT'
             });
             
@@ -116,7 +116,7 @@ function Navbar() {
     const markAllAsRead = async () => {
         const userId = user?._id;
         try {
-            const response = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/notification/${userId}/read-all`, {
+            const response = await fetch(`http://localhost:8080/api/v1/notification/${userId}/read-all`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -141,7 +141,7 @@ function Navbar() {
         if (profileImageUrl.startsWith('http://') || profileImageUrl.startsWith('https://')) {
             return profileImageUrl;
         }
-        return `https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${profileImageUrl}`;
+        return `http://localhost:8080/api/v1/auth/uploadss/${profileImageUrl}`;
     };
     
     const getNotificationContent = (notification) => {

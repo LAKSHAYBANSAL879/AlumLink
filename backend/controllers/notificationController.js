@@ -36,7 +36,6 @@ exports.createNotification = async (req, res) => {
 
     const savedNotification = await notification.save();
 
-    // Emit to socket if using real-time notifications
     if (req.app.io) {
       req.app.io.to(`user-${userId}`).emit('new_notification', savedNotification);
     }

@@ -19,7 +19,7 @@ const JobApplicantsPage = () => {
 
   const fetchApplications = async () => {
     try {
-      const response = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/application/getApplications/${jobId}`, {
+      const response = await fetch(`http://localhost:8080/api/v1/application/getApplications/${jobId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -30,11 +30,11 @@ const JobApplicantsPage = () => {
       
       if (data.success) {
         setApplications(data.applications);
-        data.applications.forEach((application) => {
-          if (application.resume) {
-            handleCheckResume(application.resume, application.job, application._id, true);
-          }
-        });
+        // data.applications.forEach((application) => {
+        //   if (application.resume) {
+        //     handleCheckResume(application.resume, application.job, application._id, true);
+        //   }
+        // });
       } else {
         setError('Failed to fetch applications');
       }
@@ -48,7 +48,7 @@ const JobApplicantsPage = () => {
   const updateStatus = async (applicationId, newStatus) => {
     setUpdateLoading(applicationId);
     try {
-      const response = await fetch('https://alumlink-ruo3.onrender.com/api/v1/application/update-status', {
+      const response = await fetch('http://localhost:8080/api/v1/application/update-status', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -89,22 +89,22 @@ const JobApplicantsPage = () => {
       ? fileUrl.replace('uploads/resumes/', '') 
       : fileUrl;
       
-    return `https://alumlink-ruo3.onrender.com/api/v1/application/${baseFilename}`;
+    return `http://localhost:8080/api/v1/application/${baseFilename}`;
   };
 
   const handleFileDownload = (fileUrl) => {
     if (!fileUrl) return;
     
-  
-    if (fileUrl.startsWith('https://')) {
-      window.open(fileUrl, '_blank');
+  const finalUrl = getFileUrl(fileUrl);
+    // if (finalUrl.startsWith('https://')) {
+      window.open(finalUrl, '_blank');
       return;
-    }
+    // }
     
-   else{
-    const baseFilename = fileUrl.replace('uploads/resumes/', '');
-    window.open(`https://alumlink-ruo3.onrender.com/api/v1/application/${baseFilename}`, '_blank');
-   }
+  //  else{
+  //   const baseFilename = finalUrl.replace('uploads/resumes/', '');
+  //   window.open(`http://localhost:8080/api/v1/application/${baseFilename}`, '_blank');
+  //  }
   };
 
   const handleCheckResume = async (resumeFilename, job, applicationId,isAuto=false) => {
@@ -116,7 +116,7 @@ const JobApplicantsPage = () => {
     setCheckingResume(applicationId);
     try {
      
-      const resumeResponse = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/application/${resumeFilename}`);
+      const resumeResponse = await fetch(`http://localhost:8080/api/v1/application/${resumeFilename}`);
       if (!resumeResponse.ok) throw new Error('Failed to fetch resume');
 
       const blob = await resumeResponse.blob();
@@ -207,6 +207,8 @@ const JobApplicantsPage = () => {
             No applications found
           </div>
         ) : (
+          <div>
+          <div className='hidden md:block'>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
@@ -254,7 +256,7 @@ const JobApplicantsPage = () => {
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 flex flex-col justify-left text-left">
                       <div className="relative inline-block">
                         <select
                           className={`p-2 border rounded appearance-none pr-8 bg-white ${
@@ -310,6 +312,109 @@ const JobApplicantsPage = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+          </div>
+
+             <div className='md:hidden block'>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Applicant</th>
+                  <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Actions</th>
+        
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredApplications.map((application) => (
+                  <tr key={application._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <div className="font-medium">{application.applicant.name}</div>
+                      <div className="text-sm text-gray-500">{application.applicant.email}</div>
+                      <div className='px-6 py-4 text-sm'>{new Date(application.appliedAt).toLocaleDateString()}</div>
+                      <div><span className={`px-3 py-1 rounded-full text-sm ${statusColors[application.status]}`}> {application.status}
+                      </span></div>
+                        <div >
+                           <div className="flex gap-4">
+                        <button
+                          onClick={() => handleFileDownload(application.resume, 'resume')}
+                          className="inline-flex items-center text-blue-600 hover:text-blue-800"
+                        >
+                          <Download className="w-4 h-4 mr-1" />
+                          Resume
+                        </button>
+                        {application.coverLetter && (
+                          <button
+                            onClick={() => handleFileDownload(application.coverLetter, 'coverLetter')}
+                            className="inline-flex items-center text-blue-600 hover:text-blue-800"
+                          >
+                            <FileText className="w-4 h-4 mr-1" />
+                            Cover
+                          </button>
+                        )}
+                      </div>
+                        </div>
+                    </td>
+                   
+                    <td className="px-6 py-4 flex flex-col">
+                      <div className="relative inline-block">
+                        <select
+                          className={`p-2 border rounded appearance-none pr-8 bg-white ${
+                            updateLoading === application._id ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          value={application.status}
+                          onChange={(e) => updateStatus(application._id, e.target.value)}
+                          disabled={updateLoading === application._id}
+                        >
+                          <option value="Applied">Applied</option>
+                          <option value="Shortlisted">Shortlisted</option>
+                          <option value="Rejected">Rejected</option>
+                          <option value="Hired">Hired</option>
+                        </select>
+                        {updateLoading === application._id ? (
+                          <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                            <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                          </div>
+                        ) : (
+                          <ChevronDown className="w-4 h-4 absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500" />
+                        )}
+                      </div>
+                      <div>
+                         {checkingResume === application._id ? (
+                        <div className="flex items-center">
+                          <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-2"></div>
+                          Analyzing...
+                        </div>
+                      ) : matchResult[application._id] ? (
+                        <div className="space-y-2">
+                          <div className="text-sm">
+                            <span className="font-medium">Skills Match:</span> {matchResult[application._id].skillsMatchScore}%
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium">Experience:</span> {matchResult[application._id].experienceYears} years
+                          </div>
+                          <div className="text-sm">
+                            <span className="font-medium">Matched Skills:</span> {matchResult[application._id].matchedSkills.join(', ')}
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => handleCheckResume(application.resume, application.job, application._id)}
+                          className="inline-flex items-center text-blue-600 hover:text-blue-800"
+                        >
+                          <FileText className="w-4 h-4 mr-1" />
+                          Analyze Resume
+                        </button>
+                      )}
+                      </div>
+                    </td>
+                  
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          </div>
           </div>
         )}
       </div>

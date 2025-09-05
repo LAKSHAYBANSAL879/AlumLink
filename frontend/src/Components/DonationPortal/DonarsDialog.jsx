@@ -17,7 +17,7 @@ const DonorsDialog = ({ open, donationRequestId, onClose }) => {
     
     setLoading(true);
     try {
-      const response = await fetch(`https://alumlink-ruo3.onrender.com/api/v1/donations/${donationRequestId}/donors`);
+      const response = await fetch(`http://localhost:8080/api/v1/donations/${donationRequestId}/donors`);
       const data = await response.json();
       
       if (data.success) {

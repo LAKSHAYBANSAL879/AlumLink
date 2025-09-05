@@ -336,7 +336,7 @@ const ChatWindow = () => {
               <Avatar 
                 src={selectedChat?.profileImageUrl && selectedChat.profileImageUrl.startsWith('http') 
                   ? selectedChat.profileImageUrl 
-                  : `https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${selectedChat?.profileImageUrl}`} 
+                  : `http://localhost:8080/api/v1/auth/uploadss/${selectedChat?.profileImageUrl}`} 
                 alt={selectedChat?.name} 
               />
             </Badge>
@@ -404,7 +404,7 @@ const ChatWindow = () => {
                   alt={selectedChat.name} 
                   src={selectedChat?.profileImageUrl && selectedChat.profileImageUrl.startsWith('http') 
                     ? selectedChat.profileImageUrl 
-                    : `https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${selectedChat?.profileImageUrl}`}
+                    : `http://localhost:8080/api/v1/auth/uploadss/${selectedChat?.profileImageUrl}`}
                   sx={{ width: 80, height: 80, mb: 2 }}
                 />
                 <Typography variant="h6">Start a conversation with {selectedChat.name}</Typography>
@@ -458,7 +458,7 @@ const ChatWindow = () => {
                             alt={selectedChat.name} 
                             src={selectedChat?.profileImageUrl && selectedChat.profileImageUrl.startsWith('http') 
                               ? selectedChat.profileImageUrl 
-                              : `https://alumlink-ruo3.onrender.com/api/v1/auth/uploadss/${selectedChat?.profileImageUrl}`}
+                              : `http://localhost:8080/api/v1/auth/uploadss/${selectedChat?.profileImageUrl}`}
                             sx={{ width: 32, height: 32, mr: 1 }}
                           />
                         )}
@@ -482,7 +482,7 @@ const ChatWindow = () => {
     
     const fullUrl = mediaUrl.startsWith('http') 
       ? mediaUrl 
-      : `https://alumlink-ruo3.onrender.com/api/v1/messages/uploads/media/${mediaUrl}`;
+      : `http://localhost:8080/api/v1/messages/uploads/media/${mediaUrl}`;
     
     
     const fileName = mediaUrl.split('/').pop();

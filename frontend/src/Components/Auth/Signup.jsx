@@ -34,7 +34,7 @@ function SignUp() {
   useEffect(() => {
     const fetchCollegeNames = async () => {
       try {
-        const response = await axios.get("https://alumlink-ruo3.onrender.com/api/v1/auth/clgNames");
+        const response = await axios.get("http://localhost:8080/api/v1/auth/clgNames");
         if (response.data.success) {
           setCollegeOptions(response.data.data);
         }
@@ -93,7 +93,7 @@ function SignUp() {
       }
 
 
-    await axios.post("https://alumlink-ruo3.onrender.com/api/v1/auth/register", formData);
+    await axios.post("http://localhost:8080/api/v1/auth/register", formData);
      navigate("/login");
     } catch (error) {
       console.error("Error registering user:", error);
